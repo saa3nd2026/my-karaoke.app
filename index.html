@@ -4,45 +4,52 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<title>STUDIO CONSOLE // v4.0-API</title>
+<title>STUDIO CONSOLE // v4.5</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@500&family=Noto+Sans+JP:wght@500;700&display=swap" rel="stylesheet">
 <style>
-/* ── デザイン：プロフェッショナル・スタジオ・ライト ── */
 :root {
   --bg: #e2e8f0; --panel: #f1f5f9; --panel-dark: #cbd5e1; --accent: #2563eb; 
   --text: #0f172a; --text-dim: #64748b; --lcd: #10b981; --red: #dc2626; --border: #94a3b8;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; overflow: hidden; height: 100vh; }
-#app { display: flex; flex-direction: column; height: 100vh; position: relative; z-index: 1; }
-header { padding: 12px 24px; display: flex; align-items: center; background: var(--panel-dark); border-bottom: 2px solid var(--border); }
+
+/* ── 押し込みボタンのアニメーション ── */
+.btn { 
+  padding: 10px; border: 1px solid var(--border); font-weight: 700; font-size: 11px; 
+  background: #f8fafc; cursor: pointer; border-radius: 4px;
+  box-shadow: 0 2px 0 var(--border);
+  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative; top: 0;
+}
+.btn:active { top: 1px; box-shadow: 0 1px 0 var(--border); }
+
+/* ON状態：凹んで、内側に影が入る（PA機材の自照式スイッチ風） */
+.btn.btn-active { 
+  background: var(--accent); color: white; border-color: #1e40af;
+  top: 2px;
+  box-shadow: inset 0 3px 6px rgba(0,0,0,0.3);
+  transform: scale(0.97);
+}
+.btn.btn-active::after {
+  content: ''; position: absolute; inset: 0; 
+  background: rgba(255,255,255,0.1); border-radius: 3px;
+}
+
+/* 共通レイアウト */
+#app { display: flex; flex-direction: column; height: 100vh; }
+header { padding: 12px 24px; display: flex; align-items: center; background: var(--panel-dark); border-bottom: 2px solid var(--border); gap: 15px; }
 main { flex: 1; display: grid; grid-template-columns: 1fr 340px; overflow: hidden; }
-
-/* ステージ */
 #stage { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; background: #fff; position: relative; }
-#lyric-display { font-size: clamp(20px, 4vw, 36px); font-weight: 700; text-align: center; border-bottom: 4px solid var(--panel-dark); padding: 20px; min-height: 120px; display: flex; align-items: center; }
-#progress-bar { width: 70%; height: 10px; background: var(--panel-dark); margin-top: 40px; border-radius: 5px; overflow: hidden; }
-#progress-fill { width: 0%; height: 100%; background: var(--accent); transition: width 0.3s linear; }
-
-/* サイドパネル */
+#lyric-display { font-size: clamp(20px, 4vw, 36px); font-weight: 700; text-align: center; border-bottom: 4px solid var(--panel-dark); padding: 20px; min-height: 120px; }
 aside { background: var(--panel); border-left: 2px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
 .card { background: var(--panel-dark); border: 1px solid var(--border); border-radius: 4px; padding: 12px; }
 .label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); margin-bottom: 6px; font-weight: 700; }
 .score-lcd { background: #1e293b; color: var(--lcd); padding: 10px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 40px; text-align: center; box-shadow: inset 0 2px 8px rgba(0,0,0,0.4); }
 
-/* 検索結果リスト */
-#yt-results { max-height: 150px; overflow-y: auto; background: #fff; border: 1px solid var(--border); border-radius: 4px; margin-top: 8px; display: none; }
-.yt-item { display: flex; gap: 8px; padding: 8px; border-bottom: 1px solid var(--bg); cursor: pointer; align-items: center; font-size: 11px; }
-.yt-item:hover { background: var(--panel); }
-.yt-item img { width: 50px; border-radius: 2px; }
-
-/* 認証画面 */
+/* ゲートパネル */
 #gate { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; align-items: center; justify-content: center; }
 .gate-panel { background: var(--panel); padding: 40px; border: 2px solid var(--border); border-radius: 12px; text-align: center; width: 380px; }
-
-.btn { padding: 10px; border: 1px solid var(--border); font-weight: 700; font-size: 11px; background: #f8fafc; cursor: pointer; box-shadow: 0 2px 0 var(--border); border-radius: 4px; }
-#start-btn { width: 100%; padding: 16px; background: #10b981; color: white; border: none; box-shadow: 0 4px 0 #059669; font-weight: 900; cursor: pointer; margin-top: auto; }
-#start-btn.stop { background: var(--red); box-shadow: 0 4px 0 #b91c1c; }
 </style>
 </head>
 <body>
@@ -56,14 +63,16 @@ aside { background: var(--panel); border-left: 2px solid var(--border); padding:
 
 <div id="app">
   <header>
-    <div style="font-family: 'JetBrains Mono'; font-weight: 700;">STUDIO<em>CONSOL</em> // v4.0-API</div>
-    <select id="mic-in" onchange="initAudio(true)" style="margin-left: auto; width: 180px; padding:5px;"></select>
+    <div style="font-family: 'JetBrains Mono'; font-weight: 700;">STUDIO<em>CONSOL</em> // v4.5</div>
+    <div style="margin-left: auto; display: flex; gap: 10px;">
+      <div><span style="font-size:9px; display:block">INPUT (Mic)</span><select id="mic-in" onchange="initAudio(true)"></select></div>
+      <div><span style="font-size:9px; display:block">OUTPUT (Speaker/HP)</span><select id="spk-out" onchange="changeOutput()"></select></div>
+    </div>
   </header>
 
   <main>
     <section id="stage">
       <div id="lyric-display">API経由で曲を検索してください</div>
-      <div id="progress-bar"><div id="progress-fill"></div></div>
       <div id="yt-player-wrap" style="position: absolute; bottom: 20px; right: 20px; width: 300px; aspect-ratio: 16/9; background: #000; border: 2px solid var(--border); display:none;"></div>
     </section>
 
@@ -80,66 +89,109 @@ aside { background: var(--panel); border-left: 2px solid var(--border); padding:
           <input type="text" id="q" placeholder="曲名・アーティスト名" style="flex:1; padding:8px;">
           <button class="btn" onclick="searchAPI()">検索</button>
         </div>
-        <div id="yt-results"></div>
+        <div id="yt-results" style="max-height:100px; overflow-y:auto; background:#fff; margin-top:5px; font-size:11px; display:none;"></div>
       </div>
 
       <div class="card">
-        <div class="label">FILES // ファイル読込</div>
-        <div style="display: flex; gap: 4px;">
-          <button class="btn" style="flex:1" onclick="document.getElementById('f-v').click()">動画・音源</button>
-          <button class="btn" style="flex:1" onclick="document.getElementById('f-l').click()">LRC歌詞</button>
-        </div>
-        <input type="file" id="f-v" hidden accept="video/*,audio/*" onchange="loadFile(event)">
-        <input type="file" id="f-l" hidden accept=".lrc" onchange="loadLRC(event)">
-      </div>
-
-      <div class="card">
-        <div class="label">FX // モニター</div>
-        <div style="display: flex; gap: 4px;">
-          <button id="tog-mon" class="btn" style="flex:1" onclick="toggleFeat('mon')">モニターON</button>
-          <button id="tog-echo" class="btn" style="flex:1" onclick="toggleFeat('echo')">エコーON</button>
+        <div class="label">FX & MONITOR // 効果</div>
+        <div style="display: flex; gap: 8px;">
+          <button id="tog-mon" class="btn btn-active" style="flex:1" onclick="toggleFeat('mon')">MONITOR</button>
+          <button id="tog-echo" class="btn btn-active" style="flex:1" onclick="toggleFeat('echo')">ECHO</button>
         </div>
       </div>
 
-      <button id="start-btn" onclick="toggle()">MASTER START // 開始</button>
+      <button id="start-btn" class="btn" style="background:#10b981; color:white; height:60px; font-size:16px;" onclick="toggle()">MASTER START</button>
     </aside>
   </main>
 </div>
 
 <script>
-// --- 修正版：APIキーの定義部分 ---
-const API_KEY = 'AIzaSyC5KcQmz45w9ESTM6QmbvXHom8ANBbV9fc';
+const API_KEY = 'AIzaSyC5KcQmz45w9ESTM6QmbvXHom8ANBbV9fc'; 
 const PASS = 'yoha_88ku99_channnnnn';
 
-let ctx, mic, anl, hp, dly, fb, mon, rec, chunks = [], stream, voiceDest;
+let ctx, mic, anl, hp, dly, fb, mon, rec, chunks = [], stream, voiceDest, player;
 let active = false, lrc = [], startT = 0, feats = { mon: true, echo: true };
 
 function auth() { if(document.getElementById('access-input').value === PASS) document.getElementById('gate').style.display='none', loadDevices(); }
 
 async function loadDevices() {
-  await navigator.mediaDevices.getUserMedia({ audio: true });
-  const ds = await navigator.mediaDevices.enumerateDevices();
-  const s = document.getElementById('mic-in');
-  ds.filter(d => d.kind === 'audioinput').forEach(d => {
-    const o = document.createElement('option'); o.value = d.deviceId; o.textContent = d.label;
-    if(d.label.includes('Sony') || d.label.includes('UAB-80')) o.selected = true;
-    s.appendChild(o);
-  });
+  try {
+    const streamTest = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const ds = await navigator.mediaDevices.enumerateDevices();
+    const micS = document.getElementById('mic-in');
+    const spkS = document.getElementById('spk-out');
+    
+    micS.innerHTML = ""; spkS.innerHTML = "";
+    ds.forEach(d => {
+      const o = document.createElement('option'); o.value = d.deviceId; o.textContent = d.label;
+      if (d.kind === 'audioinput') {
+        if(d.label.includes('Sony') || d.label.includes('UAB-80')) o.selected = true;
+        micS.appendChild(o);
+      } else if (d.kind === 'audiooutput') {
+        spkS.appendChild(o);
+      }
+    });
+    streamTest.getTracks().forEach(t => t.stop());
+  } catch(e) { console.error("Device Load Error", e); }
 }
 
-// YouTube API 検索
+async function changeOutput() {
+  const deviceId = document.getElementById('spk-out').value;
+  // 背景動画（Video/Audio）の出力先を切り替え
+  const video = document.getElementById('video-bg');
+  if (video && typeof video.setSinkId === 'function') {
+    await video.setSinkId(deviceId);
+  }
+}
+
+async function initAudio(force = false) {
+  if (ctx && !force) return true;
+  if (force && stream) stream.getTracks().forEach(t => t.stop());
+  try {
+    const id = document.getElementById('mic-in').value;
+    stream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: id ? { exact: id } : undefined, echoCancellation: false } });
+    
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') await ctx.resume();
+
+    mic = ctx.createMediaStreamSource(stream);
+    hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 100;
+    anl = ctx.createAnalyser(); dly = ctx.createDelay(); fb = ctx.createGain(); mon = ctx.createGain();
+    voiceDest = ctx.createMediaStreamDestination();
+
+    mic.connect(hp); hp.connect(anl); anl.connect(dly); dly.connect(fb); fb.connect(dly); dly.connect(mon); anl.connect(mon);
+    mon.connect(ctx.destination); mon.connect(voiceDest);
+    
+    updateFX();
+    return true;
+  } catch(e) { return false; }
+}
+
+function toggleFeat(f) {
+  feats[f] = !feats[f];
+  const btn = document.getElementById('tog-' + (f === 'mon' ? 'mon' : 'echo'));
+  btn.classList.toggle('btn-active', feats[f]);
+  updateFX();
+}
+
+function updateFX() {
+  if(!ctx) return;
+  dly.delayTime.setTargetAtTime(0.2, ctx.currentTime, 0.1);
+  fb.gain.setTargetAtTime(feats.echo ? 0.35 : 0, ctx.currentTime, 0.1);
+  mon.gain.setTargetAtTime(feats.mon ? 0.7 : 0, ctx.currentTime, 0.1);
+}
+
+// ── YouTube検索 API ──
 async function searchAPI() {
   const q = document.getElementById('q').value;
-  if(!q || API_KEY === '取得したキーをここに貼り付け') return alert("APIキーを設定してください");
-  
+  if(!q) return;
   const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q + " カラオケ")}&type=video&maxResults=5&key=${API_KEY}`);
   const data = await res.json();
-  
+  if(!data.items) return alert("API制限またはエラーです。");
   const container = document.getElementById('yt-results');
   container.innerHTML = data.items.map(item => `
-    <div class="yt-item" onclick="playVideo('${item.id.videoId}', '${item.snippet.title}')">
-      <img src="${item.snippet.thumbnails.default.url}">
-      <div>${item.snippet.title.slice(0,30)}...</div>
+    <div style="padding:5px; border-bottom:1px solid #eee; cursor:pointer" onclick="playVideo('${item.id.videoId}', '${item.snippet.title}')">
+      ${item.snippet.title}
     </div>
   `).join('');
   container.style.display = 'block';
@@ -148,69 +200,34 @@ async function searchAPI() {
 function playVideo(id, title) {
   const wrap = document.getElementById('yt-player-wrap');
   wrap.style.display = 'block';
-  wrap.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${id}?autoplay=1&origin=${encodeURIComponent(window.location.origin)}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-  document.getElementById('lyric-display').textContent = `再生中: ${title}`;
-  document.getElementById('yt-results').style.display = 'none';
-}
-
-async function initAudio(force = false) {
-  if (ctx && !force) return true;
-  try {
-    const id = document.getElementById('mic-in').value;
-    stream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: id ? { exact: id } : undefined, echoCancellation: false } });
-    ctx = new (window.AudioContext || window.webkitAudioContext)();
-    mic = ctx.createMediaStreamSource(stream);
-    hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 100;
-    anl = ctx.createAnalyser(); dly = ctx.createDelay(); fb = ctx.createGain(); mon = ctx.createGain();
-    voiceDest = ctx.createMediaStreamDestination();
-    mic.connect(hp); hp.connect(anl); anl.connect(dly); dly.connect(fb); fb.connect(dly); dly.connect(mon); anl.connect(mon);
-    mon.connect(ctx.destination); mon.connect(voiceDest);
-    updateFX();
-    return true;
-  } catch(e) { return false; }
+  wrap.innerHTML = `<iframe id="yt-frame" width="100%" height="100%" src="https://www.youtube.com/embed/${id}?autoplay=1&enablejsapi=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+  document.getElementById('lyric-display').textContent = title;
 }
 
 function toggle() {
+  const btn = document.getElementById('start-btn');
   if(active) {
-    active = false; rec.stop();
-    document.getElementById('start-btn').textContent = "MASTER START";
-    document.getElementById('start-btn').classList.remove('stop');
+    active = false;
+    btn.classList.remove('btn-active');
+    btn.style.background = "#10b981";
   } else {
     initAudio().then(ok => {
       if(!ok) return;
-      active = true; startT = Date.now();
-      document.getElementById('start-btn').textContent = "STOP & SAVE";
-      document.getElementById('start-btn').classList.add('stop');
-      startRec(); loop();
+      active = true;
+      btn.classList.add('btn-active');
+      btn.style.background = var(--red);
     });
   }
-}
-
-function startRec() {
-  chunks = []; rec = new MediaRecorder(voiceDest.stream);
-  rec.ondataavailable = e => chunks.push(e.data);
-  rec.onstop = () => {
-    const blob = new Blob(chunks, { type: 'audio/webm' });
-    const url = URL.createObjectURL(blob);
-    const row = document.createElement('div');
-    row.innerHTML = `<a href="${url}" download="take.webm" style="font-size:11px; color:var(--accent);">最新の録音をダウンロード</a>`;
-    document.getElementById('stage').appendChild(row);
-  };
-  rec.start();
 }
 
 function loop() {
   if(!active) return; requestAnimationFrame(loop);
   const d = new Float32Array(anl.fftSize); anl.getFloatTimeDomainData(d);
-  const now = (Date.now() - startT)/1000;
-  const line = lrc.findLast(l => l.t <= now);
-  if(line) document.getElementById('lyric-display').textContent = line.txt;
+  const cv = document.getElementById('viz'); const cc = cv.getContext('2d');
+  cc.clearRect(0,0,cv.width,cv.height); cc.beginPath(); cc.strokeStyle = '#10b981';
+  for(let i=0; i<d.length; i++) cc.lineTo(i*(cv.width/d.length), (d[i]*0.5+0.5)*cv.height);
+  cc.stroke();
 }
-
-function loadFile(e) { /* 前回のロジックと同じ */ }
-function loadLRC(e) { /* 前回のロジックと同じ */ }
-function toggleFeat(f) { feats[f] = !feats[f]; updateFX(); }
-function updateFX() { if(!ctx) return; dly.delayTime.setTargetAtTime(0.2, ctx.currentTime, 0.1); fb.gain.setTargetAtTime(feats.echo ? 0.3 : 0, ctx.currentTime, 0.1); mon.gain.setTargetAtTime(feats.mon ? 0.7 : 0, ctx.currentTime, 0.1); }
 </script>
 </body>
 </html>
