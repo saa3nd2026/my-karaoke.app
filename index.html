@@ -4,66 +4,38 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<title>KARAOKE.web // Pro Studio</title>
+<title>KARAOKE.web // Studio Console</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@500&family=Noto+Sans+JP:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #e2e8f0; --panel: #f1f5f9; --panel-dark: #cbd5e1; --accent: #2563eb; 
   --text: #0f172a; --text-dim: #64748b; --lcd: #10b981; --red: #dc2626; --border: #94a3b8;
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { 
-  background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; 
-  overflow: hidden; height: 100vh; width: 100vw;
-}
-
+body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
 #video-bg { position: fixed; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; opacity: 0.1; filter: grayscale(1); }
-
-/* ── 認証画面（中央配置に修正） ── */
-#gate {
-  position: fixed; inset: 0; z-index: 9999; background: var(--bg);
-  display: flex; align-items: center; justify-content: center;
-}
-.gate-panel {
-  background: var(--panel); padding: 40px; border: 2px solid var(--border);
-  border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
-  text-align: center; width: 380px; max-width: 90%;
-}
-
+#gate { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; align-items: center; justify-content: center; }
+.gate-panel { background: var(--panel); padding: 40px; border: 2px solid var(--border); border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); text-align: center; width: 380px; max-width: 95%; }
 #app { display: flex; flex-direction: column; height: 100vh; position: relative; z-index: 1; }
-
-header {
-  padding: 12px 24px; display: flex; align-items: center;
-  background: var(--panel-dark); border-bottom: 2px solid var(--border);
-}
-
+header { padding: 12px 24px; display: flex; align-items: center; background: var(--panel-dark); border-bottom: 2px solid var(--border); }
 main { flex: 1; display: grid; grid-template-columns: 1fr 340px; overflow: hidden; }
-
-/* ── ステージ ── */
 #stage { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; background: #fff; position: relative; }
 #lyric-display { font-size: clamp(20px, 4vw, 36px); font-weight: 700; text-align: center; border-bottom: 4px solid var(--panel-dark); padding: 20px; }
 #progress-bar { width: 70%; height: 10px; background: var(--panel-dark); margin-top: 40px; border-radius: 5px; overflow: hidden; }
 #progress-fill { width: 0%; height: 100%; background: var(--accent); transition: width 0.3s linear; }
-
-/* ── 右サイドコンソール ── */
 aside { background: var(--panel); border-left: 2px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 15px; }
 .card { background: var(--panel-dark); border: 1px solid var(--border); border-radius: 4px; padding: 12px; }
 .label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); margin-bottom: 6px; font-weight: 700; }
 .score-lcd { background: #1e293b; color: var(--lcd); padding: 10px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 40px; text-align: center; box-shadow: inset 0 2px 8px rgba(0,0,0,0.4); }
-
 .input-group { display: flex; gap: 4px; margin-bottom: 8px; }
 input[type=text], select, input[type=password] { flex: 1; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 10px; font-size: 13px; outline: none; }
 .btn { padding: 10px; border-radius: 4px; border: 1px solid var(--border); font-weight: 700; font-size: 11px; background: #f8fafc; cursor: pointer; box-shadow: 0 2px 0 var(--border); }
 .btn:active { transform: translateY(2px); box-shadow: none; }
 .btn-on { background: var(--accent); color: white; border-color: #1e40af; }
-
 #start-btn { width: 100%; padding: 16px; background: #10b981; color: white; border-radius: 4px; border: none; box-shadow: 0 4px 0 #059669; font-weight: 900; cursor: pointer; margin-top: auto; }
 #start-btn.stop { background: var(--red); box-shadow: 0 4px 0 #b91c1c; }
-
 canvas { width: 100%; height: 40px; background: #0f172a; border-radius: 2px; }
-
-@media (max-width: 720px) { main { grid-template-columns: 1fr; } aside { position: fixed; bottom: 0; width: 100%; height: 45%; } }
+@media (max-width: 720px) { main { grid-template-columns: 1fr; } aside { position: fixed; bottom: 0; width: 100%; height: 45%; border-left:none; border-top:2px solid var(--border); } }
 </style>
 </head>
 <body>
@@ -72,7 +44,7 @@ canvas { width: 100%; height: 40px; background: #0f172a; border-radius: 2px; }
   <div class="gate-panel">
     <div style="font-family: 'JetBrains Mono'; font-size: 20px; font-weight: 700; margin-bottom: 20px;">STUDIO<em>CONSOL</em> JP</div>
     <input type="password" id="access-input" placeholder="パスコードを入力" oninput="auth()" style="width: 100%; text-align: center; letter-spacing: 4px;">
-    <p style="font-size: 11px; color: var(--text-dim); margin-top: 15px;">※ Sony UAB-80 & Bluetooth対応済</p>
+    <p style="font-size: 11px; color: var(--text-dim); margin-top: 15px;">スタジオ認証完了後に起動します</p>
   </div>
 </div>
 
@@ -80,28 +52,28 @@ canvas { width: 100%; height: 40px; background: #0f172a; border-radius: 2px; }
 
 <div id="app">
   <header>
-    <div style="font-family: 'JetBrains Mono'; font-weight: 700;">STUDIO<em>CONSOL</em> // v3.5-FIX</div>
+    <div style="font-family: 'JetBrains Mono'; font-weight: 700;">STUDIO<em>CONSOL</em> // v3.6-RELEASE</div>
     <select id="mic-in" onchange="initAudio(true)" style="margin-left: auto; width: 180px;"></select>
   </header>
 
   <main>
     <section id="stage">
-      <div id="lyric-display">機材をセットアップしてください</div>
+      <div id="lyric-display">マイクの使用を許可してください</div>
       <div id="progress-bar"><div id="progress-fill"></div></div>
       <div id="yt-wrap" style="position: absolute; bottom: 20px; right: 20px; width: 300px; aspect-ratio: 16/9; background: #000; border: 2px solid var(--border); display:none;"></div>
     </section>
 
     <aside>
       <div class="card">
-        <div class="label">採点ユニット</div>
+        <div class="label">GRADES // 採点</div>
         <div class="score-lcd" id="score-num">00</div>
         <canvas id="viz" style="margin-top:10px;"></canvas>
       </div>
 
       <div class="card">
-        <div class="label">音源入力</div>
+        <div class="label">SOURCE // 音源入力</div>
         <div class="input-group">
-          <input type="text" id="q" placeholder="YouTube検索（曲名など）">
+          <input type="text" id="q" placeholder="YouTube検索（曲名 歌手名）">
           <button class="btn" onclick="search()">検索</button>
         </div>
         <div style="display: flex; gap: 4px;">
@@ -113,7 +85,8 @@ canvas { width: 100%; height: 40px; background: #0f172a; border-radius: 2px; }
       </div>
 
       <div class="card">
-        <div class="label">モニター・エコー設定</div>
+        <div class="label">EFFECTS // エコー・モニター</div>
+        <div style="font-size:9px; margin-bottom:5px; color:var(--text-dim);">ECHO_DEPTH</div>
         <input type="range" id="fx-echo" style="width:100%; accent-color:var(--accent);" value="35">
         <div style="display: flex; gap: 4px; margin-top: 10px;">
           <button id="tog-mon" class="btn btn-on" style="flex:1" onclick="toggleFeat('mon')">モニターON</button>
@@ -122,7 +95,7 @@ canvas { width: 100%; height: 40px; background: #0f172a; border-radius: 2px; }
       </div>
 
       <div class="card">
-        <div class="label">録音済みテイク</div>
+        <div class="label">ARCHIVE // 録音済みテイク</div>
         <div id="rec-container" style="max-height: 80px; overflow-y: auto; font-size: 11px;"></div>
       </div>
 
@@ -130,8 +103,6 @@ canvas { width: 100%; height: 40px; background: #0f172a; border-radius: 2px; }
     </aside>
   </main>
 </div>
-
-<audio id="player" style="display:none"></audio>
 
 <script>
 const KEY = 'yoha_88ku99_channnnnn';
@@ -166,7 +137,7 @@ function search() {
   const wrap = document.getElementById('yt-wrap');
   wrap.style.display = 'block';
   
-  // 広告ブロックによるエラー回避のため、originを確実に指定し、sandbox属性で制限をかける
+  // 広告ブロックの影響を最小限にするため origin を明示
   const myOrigin = window.location.origin;
   const embedUrl = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(q + " カラオケ")}&origin=${encodeURIComponent(myOrigin)}&enablejsapi=1&rel=0&autoplay=1`;
   
@@ -177,14 +148,16 @@ function search() {
       frameborder="0" 
       allow="autoplay; encrypted-media" 
       allowfullscreen
-      referrerpolicy="strict-origin-when-cross-origin">
+      referrerpolicy="no-referrer">
     </iframe>`;
-  document.getElementById('lyric-display').textContent = "YouTubeを読み込み中...";
 }
 
 async function initAudio(force = false) {
   if (ctx && !force) return true;
-  if (force && stream) stream.getTracks().forEach(t => t.stop());
+  // 古いトラックを明示的に停止
+  if (force && stream) {
+    stream.getTracks().forEach(t => t.stop());
+  }
   try {
     const id = document.getElementById('mic-in').value;
     stream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: id ? { exact: id } : undefined, echoCancellation: false } });
@@ -219,7 +192,7 @@ function toggle() {
 
 function startRec() {
   chunks = []; rec = new MediaRecorder(voiceDest.stream);
-  rec.ondataavailable = e => chunks.push(e.data);
+  rec.ondataavailable = e => { if(e.data.size > 0) chunks.push(e.data); };
   rec.onstop = saveRec; rec.start();
 }
 
@@ -227,7 +200,7 @@ function saveRec() {
   const blob = new Blob(chunks, { type: 'audio/webm' });
   const url = URL.createObjectURL(blob);
   const row = document.createElement('div');
-  row.style.display = "flex"; row.style.justifyContent = "space-between"; row.style.padding = "4px 0";
+  row.style.display = "flex"; row.style.justifyContent = "space-between"; row.style.padding = "4px 0"; row.style.borderBottom = "1px solid var(--border)";
   row.innerHTML = `<span>Take_${new Date().toLocaleTimeString()}</span>
     <a href="${url}" download="take.webm" style="color:var(--accent);text-decoration:none">保存</a>`;
   document.getElementById('rec-container').prepend(row);
@@ -246,7 +219,10 @@ function loop() {
   if(line) document.getElementById('lyric-display').textContent = line.txt;
 }
 
-function loadFile(e) { document.getElementById('video-bg').src = URL.createObjectURL(e.target.files[0]); }
+function loadFile(e) { 
+  const file = e.target.files[0];
+  if(file) document.getElementById('video-bg').src = URL.createObjectURL(file); 
+}
 function loadLRC(e) {
   const r = new FileReader();
   r.onload = f => {
@@ -260,6 +236,9 @@ function loadLRC(e) {
 
 function toggleFeat(f) { feats[f] = !feats[f]; document.getElementById('tog-'+f).classList.toggle('btn-on', feats[f]); updateFX(); }
 function updateFX() { if(!ctx) return; dly.delayTime.setTargetAtTime(0.2, ctx.currentTime, 0.1); fb.gain.setTargetAtTime(feats.echo ? 0.3 : 0, ctx.currentTime, 0.1); mon.gain.setTargetAtTime(feats.mon ? 0.7 : 0, ctx.currentTime, 0.1); }
+
+// タブを閉じる際にトラックを止める
+window.onbeforeunload = () => { if(stream) stream.getTracks().forEach(t => t.stop()); };
 </script>
 </body>
 </html>
