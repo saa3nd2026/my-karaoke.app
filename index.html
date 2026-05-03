@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>スタジオコンソール // v5.1</title>
+<title>スタジオコンソール // v5.5</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@500&family=Noto+Sans+JP:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #e2e8f0; --panel: #f1f5f9; --panel-dark: #cbd5e1; --accent: #2563eb; 
-  --text: #0f172a; --text-dim: #64748b; --lcd: #10b981; --red: #ef4444; --border: #94a3b8;
+  --text: #0f172a; --text-dim: #64748b; --lcd: #10b981; --red: #ef4444; --border: #94a3b8; --gold: #f59e0b;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; overflow: hidden; height: 100vh; }
@@ -22,105 +22,97 @@ main { flex: 1; display: grid; grid-template-columns: 1fr 340px; overflow: hidde
 
 /* ── ステージ ── */
 #stage { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; background: #fff; position: relative; }
-#lyric-display { font-size: clamp(18px, 3.5vw, 32px); font-weight: 700; text-align: center; border-bottom: 4px solid var(--panel-dark); padding: 20px; min-height: 120px; display: flex; align-items: center; }
+#lyric-display { font-size: clamp(18px, 3.5vw, 32px); font-weight: 700; text-align: center; border-bottom: 4px solid var(--panel-dark); padding: 20px; min-height: 120px; display: flex; align-items: center; z-index: 2; }
 
-/* ── 使いかたガイド ── */
-#guide-overlay {
-  background: rgba(255,255,255,0.9); border: 1px dashed var(--accent);
-  padding: 15px; margin-top: 20px; border-radius: 8px; font-size: 13px; color: var(--accent);
-  line-height: 1.6; max-width: 500px;
-}
+/* ── 採点エフェクト ── */
+#combo-wrap { position: absolute; top: 40px; right: 40px; text-align: right; font-family: 'JetBrains Mono', monospace; }
+#combo-num { font-size: 48px; font-weight: 900; color: var(--gold); text-shadow: 2px 2px 0 rgba(0,0,0,0.1); }
+#rating-text { font-size: 14px; color: var(--text-dim); font-weight: 700; }
 
 /* ── サイドパネル ── */
 aside { background: var(--panel); border-left: 2px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
-.card { background: var(--panel-dark); border: 1px solid var(--border); border-radius: 4px; padding: 12px; box-shadow: 1px 1px 0 rgba(255,255,255,0.8); }
+.card { background: var(--panel-dark); border: 1px solid var(--border); border-radius: 4px; padding: 12px; }
 .label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); margin-bottom: 8px; font-weight: 700; }
+
+.score-lcd {
+  background: #1e293b; color: var(--lcd); padding: 10px; border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace; font-size: 48px; text-align: center;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.4); text-shadow: 0 0 15px var(--lcd);
+}
 
 .btn { 
   padding: 10px; border: 1px solid var(--border); font-weight: 700; font-size: 11px; 
-  background: #f8fafc; cursor: pointer; border-radius: 4px;
-  box-shadow: 0 3px 0 var(--border);
+  background: #f8fafc; cursor: pointer; border-radius: 4px; box-shadow: 0 3px 0 var(--border);
   transition: all 0.1s ease; position: relative; top: 0; outline: none;
 }
 .btn:active { top: 2px; box-shadow: 0 1px 0 var(--border); }
-.btn.btn-active { 
-  background: var(--accent) !important; color: white !important; 
-  top: 3px; box-shadow: inset 0 4px 6px rgba(0,0,0,0.3); transform: scale(0.97);
-}
+.btn.btn-active { background: var(--accent) !important; color: white !important; top: 3px; box-shadow: inset 0 4px 6px rgba(0,0,0,0.3); transform: scale(0.97); }
 
-/* ── ゲート ── */
-#gate { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; align-items: center; justify-content: center; }
-.gate-panel { background: var(--panel); padding: 40px; border: 2px solid var(--border); border-radius: 12px; text-align: center; width: 380px; }
+#start-btn { background: #10b981; color: white; height: 60px; font-size: 16px; width: 100%; margin-top: auto; }
 
-canvas { width: 100%; height: 40px; background: #0f172a; border-radius: 2px; }
-select, input[type=text], input[type=password] { background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 8px; font-size: 12px; outline: none; width: 100%; }
+canvas { width: 100%; height: 50px; background: #0f172a; border-radius: 2px; }
 </style>
 </head>
 <body>
 
-<div id="gate">
-  <div class="gate-panel">
+<div id="gate" style="position:fixed; inset:0; z-index:9999; background:var(--bg); display:flex; align-items:center; justify-content:center;">
+  <div style="background:var(--panel); padding:40px; border:2px solid var(--border); border-radius:12px; text-align:center; width:380px;">
     <div class="logo" style="font-size: 20px; margin-bottom: 24px;">STUDIO<em>CONSOL</em> // LOGIN</div>
-    <input type="password" id="access-input" placeholder="パスコードを入力" oninput="auth()">
+    <input type="password" id="access-input" placeholder="パスコード" oninput="auth()" style="width:100%; padding:10px; border-radius:4px; border:1px solid var(--border);">
   </div>
 </div>
 
 <div id="app">
   <header>
-    <div class="logo">STUDIO<em>CONSOL</em> // v5.1</div>
-    <div style="margin-left: auto; display: flex; gap: 15px;">
-      <div><span style="font-size:8px;">INPUT</span><br><select id="mic-in" onchange="initAudio(true)" style="width:140px;"></select></div>
-      <div><span style="font-size:8px;">OUTPUT</span><br><select id="spk-out" onchange="changeOutput()" style="width:140px;"></select></div>
+    <div class="logo">STUDIO<em>CONSOL</em> // v5.5</div>
+    <div style="margin-left:auto; display:flex; gap:15px;">
+      <div><span style="font-size:8px;">MIC</span><br><select id="mic-in" onchange="initAudio(true)" style="width:140px;"></select></div>
+      <div><span style="font-size:8px;">SPK</span><br><select id="spk-out" onchange="changeOutput()" style="width:140px;"></select></div>
     </div>
   </header>
 
   <main>
     <section id="stage">
-      <div id="lyric-display">準備が整いました。</div>
-      
-      <div id="guide-overlay">
-        <strong>【 ご利用ガイド 】</strong><br>
-        1. 右側の検索欄に曲名を入れて<strong>「YouTubeを開く」</strong>を押す<br>
-        2. 別タブで好きなカラオケ音源を探し、URLをコピーする<br>
-        3. 下の入力欄にURLを貼り付けて<strong>「動画読込」</strong>を押す<br>
-        4. <strong>「マスター開始」</strong>を押して歌唱スタート！
+      <div id="combo-wrap">
+        <div id="rating-text">PERFECT</div>
+        <div id="combo-num">0</div>
       </div>
-
-      <div id="yt-player-wrap" style="position: absolute; bottom: 20px; right: 20px; width: 320px; aspect-ratio: 16/9; background: #000; border: 2px solid var(--border); display:none;"></div>
+      <div id="lyric-display">曲を読み込んでマスターを開始してください</div>
+      <div id="yt-player-wrap" style="position: absolute; bottom: 20px; right: 20px; width: 320px; aspect-ratio: 16/9; background: #000; display:none;"></div>
     </section>
 
     <aside>
       <div class="card">
-        <div class="label">1. YouTubeで曲を探す</div>
-        <div style="display:flex; gap:4px;">
-          <input type="text" id="q" placeholder="曲名やアーティスト名">
-          <button class="btn" style="width:100px;" onclick="searchByWeb()">YouTubeを開く</button>
+        <div class="label">ANALYZER // リアルタイム採点</div>
+        <div class="score-lcd" id="score-num">00.00</div>
+        <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:10px; font-weight:700;">
+          <span>MAX: <span id="max-score">00.00</span></span>
+          <span id="rank-display" style="color:var(--gold);">RANK -</span>
         </div>
-      </div>
-
-      <div class="card">
-        <div class="label">2. 動画URLを貼り付けて再生</div>
-        <div style="display:flex; gap:4px;">
-          <input type="text" id="v-url" placeholder="https://www.youtube.com/watch?v=...">
-          <button class="btn" style="width:80px;" onclick="playByUrl()">動画読込</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="label">モニター・波形出力</div>
-        <div style="background:#1e293b; color:var(--lcd); font-family:'JetBrains Mono'; font-size:32px; text-align:center; padding:5px; border-radius:4px;" id="score-num">00</div>
         <canvas id="viz" style="margin-top:10px;"></canvas>
       </div>
 
       <div class="card">
-        <div class="label">FX設定</div>
-        <div style="display: flex; gap: 8px;">
-          <button id="tog-mon" class="btn btn-active" style="flex:1" onclick="toggleFeat('mon')">モニターON</button>
-          <button id="tog-echo" class="btn btn-active" style="flex:1" onclick="toggleFeat('echo')">エコーON</button>
+        <div class="label">SEARCH // YouTube検索</div>
+        <div style="display:flex; gap:4px; margin-bottom:5px;">
+          <input type="text" id="q" placeholder="曲名/歌手名" style="flex:1; padding:8px; border:1px solid var(--border); border-radius:4px;">
+          <button class="btn" onclick="window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(document.getElementById('q').value + ' カラオケ')}`, '_blank')">検索</button>
+        </div>
+        <div style="display:flex; gap:4px;">
+          <input type="text" id="v-url" placeholder="動画URLを貼り付け" style="flex:1; padding:8px; border:1px solid var(--border); border-radius:4px;">
+          <button class="btn" onclick="playByUrl()">読込</button>
         </div>
       </div>
 
-      <button id="start-btn" class="btn" onclick="toggle()" style="background:#10b981; color:white; height:60px; font-size:16px;">マスター開始 // START</button>
+      <div class="card">
+        <div class="label">FX // エフェクト</div>
+        <div style="display: flex; gap: 8px;">
+          <button id="tog-mon" class="btn btn-active" style="flex:1" onclick="toggleFeat('mon')">MONITOR ON</button>
+          <button id="tog-echo" class="btn btn-active" style="flex:1" onclick="toggleFeat('echo')">ECHO ON</button>
+        </div>
+      </div>
+
+      <button id="start-btn" class="btn" onclick="toggle()">MASTER START</button>
     </aside>
   </main>
 </div>
@@ -129,6 +121,7 @@ select, input[type=text], input[type=password] { background: #fff; border: 1px s
 const PASS = 'yoha_88ku99_channnnnn';
 let ctx, mic, anl, hp, dly, fb, mon, stream, voiceDest;
 let active = false, feats = { mon: true, echo: true };
+let currentScore = 0, maxScore = 0, combo = 0;
 
 function auth() { if(document.getElementById('access-input').value === PASS) document.getElementById('gate').style.display='none', loadDevices(); }
 
@@ -136,39 +129,27 @@ async function loadDevices() {
   try {
     await navigator.mediaDevices.getUserMedia({ audio: true });
     const ds = await navigator.mediaDevices.enumerateDevices();
-    const micS = document.getElementById('mic-in');
-    const spkS = document.getElementById('spk-out');
+    const micS = document.getElementById('mic-in'), spkS = document.getElementById('spk-out');
     micS.innerHTML = ""; spkS.innerHTML = "";
     ds.forEach(d => {
-      const o = document.createElement('option'); o.value = d.deviceId; o.textContent = d.label || "未設定デバイス";
+      const o = document.createElement('option'); o.value = d.deviceId; o.textContent = d.label;
       if (d.kind === 'audioinput') {
         if(d.label.includes('Sony') || d.label.includes('UAB-80')) o.selected = true;
         micS.appendChild(o);
       } else if (d.kind === 'audiooutput') spkS.appendChild(o);
     });
-  } catch(e) { console.error("マイクまたはスピーカーの読み込みに失敗しました。", e); }
-}
-
-function searchByWeb() {
-  const q = document.getElementById('q').value;
-  if(!q) return alert("曲名を入力してください");
-  window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(q + " カラオケ")}`, '_blank');
-  document.getElementById('lyric-display').textContent = "別タブで音源を探してください...";
+  } catch(e) { console.error(e); }
 }
 
 function playByUrl() {
   const url = document.getElementById('v-url').value;
-  let vid = "";
-  if(url.includes('v=')) vid = url.split('v=')[1].split('&')[0];
-  else if(url.includes('be/')) vid = url.split('be/')[1].split('?')[0];
-
+  let vid = url.includes('v=') ? url.split('v=')[1].split('&')[0] : (url.includes('be/') ? url.split('be/')[1].split('?')[0] : "");
   if(vid) {
     const wrap = document.getElementById('yt-player-wrap');
     wrap.style.display = 'block';
-    wrap.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${vid}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-    document.getElementById('lyric-display').textContent = "動画を読み込みました。";
-    document.getElementById('guide-overlay').style.display = "none";
-  } else alert("正しいYouTubeのURLを入力してください");
+    wrap.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${vid}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media"></iframe>`;
+    document.getElementById('lyric-display').textContent = "動画ロード完了。準備はいいですか？";
+  }
 }
 
 async function initAudio(force = false) {
@@ -180,24 +161,19 @@ async function initAudio(force = false) {
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     if (ctx.state === 'suspended') await ctx.resume();
     mic = ctx.createMediaStreamSource(stream);
-    hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 100;
     anl = ctx.createAnalyser(); dly = ctx.createDelay(); fb = ctx.createGain(); mon = ctx.createGain();
+    hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 100;
     voiceDest = ctx.createMediaStreamDestination();
     mic.connect(hp); hp.connect(anl); anl.connect(dly); dly.connect(fb); fb.connect(dly); dly.connect(mon); anl.connect(mon);
     mon.connect(ctx.destination); mon.connect(voiceDest);
     updateFX();
     return true;
-  } catch(e) { 
-    alert("マイクの初期化に失敗しました。システム環境設定でアクセス許可を確認してください。");
-    return false; 
-  }
+  } catch(e) { alert("機材エラー：マイクを確認してください"); return false; }
 }
 
 function toggleFeat(f) {
   feats[f] = !feats[f];
-  const b = document.getElementById('tog-' + f);
-  b.classList.toggle('btn-active', feats[f]);
-  b.textContent = (f === 'mon' ? 'モニター' : 'エコー') + (feats[f] ? 'ON' : 'OFF');
+  document.getElementById('tog-' + f).classList.toggle('btn-active', feats[f]);
   updateFX();
 }
 
@@ -211,18 +187,12 @@ function updateFX() {
 function toggle() {
   const btn = document.getElementById('start-btn');
   if(active) {
-    active = false;
-    btn.classList.remove('btn-active');
-    btn.style.background = "#10b981";
-    btn.textContent = "マスター開始 // START";
+    active = false; btn.style.background = "#10b981"; btn.textContent = "MASTER START";
   } else {
     initAudio().then(ok => {
       if(!ok) return;
-      active = true;
-      btn.classList.add('btn-active');
-      btn.style.background = "#ef4444";
-      btn.textContent = "停止・保存 // STOP";
-      loop();
+      active = true; btn.style.background = "#ef4444"; btn.textContent = "STOP & RESET";
+      currentScore = 0; combo = 0; loop();
     });
   }
 }
@@ -230,12 +200,40 @@ function toggle() {
 function loop() {
   if(!active) return; requestAnimationFrame(loop);
   const d = new Float32Array(anl.fftSize); anl.getFloatTimeDomainData(d);
-  const cv = document.getElementById('viz'); const cc = cv.getContext('2d');
+  
+  // ── 採点ロジック ──
+  const rms = Math.sqrt(d.reduce((a,b)=>a+b*b,0)/d.length); // 声量
+  const vol = Math.min(rms * 500, 100); // 0-100に正規化
+  
+  if(vol > 5) { // 一定以上の声が出ているとき
+    currentScore = currentScore * 0.95 + vol * 0.05; // 平滑化
+    combo++;
+    const rating = vol > 80 ? "PERFECT" : (vol > 50 ? "GREAT" : "GOOD");
+    document.getElementById('rating-text').textContent = rating;
+    document.getElementById('rating-text').style.color = vol > 80 ? "var(--gold)" : "var(--lcd)";
+  } else {
+    combo = 0;
+    currentScore *= 0.99; // 徐々に下がる
+    document.getElementById('rating-text').textContent = "IDLE";
+    document.getElementById('rating-text').style.color = "var(--text-dim)";
+  }
+
+  // UI更新
+  if(currentScore > maxScore) {
+    maxScore = currentScore;
+    document.getElementById('max-score').textContent = maxScore.toFixed(2);
+  }
+  document.getElementById('score-num').textContent = currentScore.toFixed(2);
+  document.getElementById('combo-num').textContent = combo;
+  
+  const rank = currentScore > 90 ? "RANK S" : (currentScore > 70 ? "RANK A" : "RANK B");
+  document.getElementById('rank-display').textContent = rank;
+
+  // 波形描画
+  const cv = document.getElementById('viz'), cc = cv.getContext('2d');
   cc.clearRect(0,0,cv.width,cv.height); cc.beginPath(); cc.strokeStyle = '#10b981';
   for(let i=0; i<d.length; i++) cc.lineTo(i*(cv.width/d.length), (d[i]*0.5+0.5)*cv.height);
   cc.stroke();
-  const rms = Math.sqrt(d.reduce((a,b)=>a+b*b,0)/d.length);
-  document.getElementById('score-num').textContent = Math.floor(rms*200).toString().padStart(2, '0');
 }
 </script>
 </body>
