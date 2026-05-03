@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>STUDIO CONSOL // v9.0 FX-SLIDER</title>
+<title>STUDIO CONSOL // v9.5 PRO</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&family=JetBrains+Mono:wght@500&family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
 <style>
 :root { --bg: #e2e8f0; --panel: #f1f5f9; --accent: #2563eb; --text: #0f172a; --lcd: #10b981; --red: #ef4444; --border: #94a3b8; --gold: #f59e0b; }
@@ -12,82 +12,93 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', s
 header { padding: 12px 24px; display: flex; align-items: center; background: #cbd5e1; border-bottom: 2px solid var(--border); gap: 20px; z-index: 10; }
 main { flex: 1; display: grid; grid-template-columns: 1fr 340px; overflow: hidden; }
 
-/* ── ステージ ── */
 #stage { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; position: relative; overflow: hidden; background: #fff; }
 #bg-container { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
-#bg-container img, #bg-container video { width: 100%; height: 100%; object-fit: cover; opacity: 0.35; }
-#lyric-display { font-size: 24px; font-weight: 900; text-align: center; border-bottom: 4px solid #cbd5e1; padding: 20px; min-height: 120px; display: flex; align-items: center; z-index: 2; width: 85%; background: rgba(255,255,255,0.85); border-radius: 8px; backdrop-filter: blur(5px); }
+#bg-container img, #bg-container video { width: 100%; height: 100%; object-fit: cover; opacity: 0.3; }
 
-/* ── スライダー ── */
-.fx-control { margin-top: 10px; }
-.fx-control label { display: flex; justify-content: space-between; font-size: 9px; font-family: 'JetBrains Mono'; margin-bottom: 4px; color: var(--text-dim); }
-input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--accent); }
+#lyric-display { font-size: 28px; font-weight: 900; text-align: center; border-bottom: 4px solid var(--accent); padding: 20px; min-height: 140px; display: flex; flex-direction: column; justify-content: center; z-index: 2; width: 85%; background: rgba(255,255,255,0.9); border-radius: 12px; backdrop-filter: blur(8px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+#combo-view { color: var(--gold); font-family: 'JetBrains Mono'; font-size: 18px; margin-top: 10px; }
+
+#producer-comment { margin-top: 25px; padding: 20px; background: rgba(15, 23, 42, 0.95); color: #fff; border-radius: 12px; font-size: 14px; z-index: 2; border-left: 5px solid var(--gold); max-width: 80%; line-height: 1.7; display: none; animation: slideUp 0.5s ease-out; }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
 aside { background: var(--panel); border-left: 2px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; z-index: 10; }
-.card { background: #cbd5e1; border: 1px solid var(--border); border-radius: 4px; padding: 12px; }
-.score-lcd { background: #1e293b; color: var(--lcd); padding: 10px; border-radius: 4px; font-family: 'JetBrains Mono'; font-size: 42px; text-align: center; box-shadow: inset 0 2px 8px rgba(0,0,0,0.4); }
+.card { background: #cbd5e1; border: 1px solid var(--border); border-radius: 6px; padding: 15px; }
+.label { font-size: 10px; font-family: 'JetBrains Mono'; color: var(--text-dim); margin-bottom: 10px; display: block; }
+.score-lcd { background: #1e293b; color: var(--lcd); padding: 15px; border-radius: 6px; font-family: 'JetBrains Mono'; font-size: 48px; text-align: center; letter-spacing: -2px; }
 
-.btn { padding: 10px; border: 1px solid var(--border); font-weight: 700; font-size: 11px; background: #f8fafc; cursor: pointer; border-radius: 4px; box-shadow: 0 3px 0 var(--border); transition: 0.1s; position: relative; outline: none; }
-.btn:active { top: 2px; box-shadow: 0 1px 0 var(--border); }
-#start-btn { background: #10b981; color: white; height: 64px; font-size: 16px; width: 100%; font-weight: 900; margin-top: auto; }
-canvas { width: 100%; height: 50px; background: #0f172a; border-radius: 2px; }
+.fx-control { margin-bottom: 12px; }
+.fx-control label { display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 5px; }
+input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--accent); }
+
+.btn { padding: 12px; border: 1px solid var(--border); font-weight: 700; font-size: 12px; background: #f8fafc; cursor: pointer; border-radius: 6px; box-shadow: 0 4px 0 var(--border); transition: 0.1s; position: relative; }
+.btn:active { top: 2px; box-shadow: 0 2px 0 var(--border); }
+#start-btn { background: #10b981; color: white; height: 70px; font-size: 18px; width: 100%; font-weight: 900; margin-top: auto; border: none; }
+canvas { width: 100%; height: 60px; background: #0f172a; border-radius: 4px; margin-top: 10px; }
 </style>
 </head>
 <body>
 
 <div id="gate" style="position:fixed; inset:0; z-index:9999; background:var(--bg); display:flex; align-items:center; justify-content:center;">
-  <div style="background:var(--panel); padding:40px; border:2px solid var(--border); border-radius:12px; text-align:center; width:380px;">
-    <h2 style="margin-bottom:20px;">STUDIO CONSOL v9.0</h2>
-    <input type="password" id="access-input" placeholder="PASSCODE" style="width:100%; padding:12px; text-align:center; margin-bottom:15px; border-radius:4px; border:1px solid var(--border);">
-    <button class="btn" style="width:100%; background:var(--accent); color:white;" onclick="unlock()">システム起動</button>
+  <div style="background:var(--panel); padding:50px; border:2px solid var(--border); border-radius:16px; text-align:center; width:420px; box-shadow: 0 20px 50px rgba(0,0,0,0.2);">
+    <h2 style="margin-bottom:20px; letter-spacing: 2px;">STUDIO CONSOL PRO</h2>
+    <input type="password" id="access-input" placeholder="PASSCODE" style="width:100%; padding:15px; text-align:center; margin-bottom:20px; border-radius:8px; border:1px solid var(--border); font-size:18px;">
+    <button class="btn" style="width:100%; background:var(--accent); color:white; height:50px;" onclick="unlock()">INITIALIZE SYSTEM</button>
   </div>
 </div>
 
 <div id="app">
   <header>
-    <div style="font-weight:900;">STUDIO<em>CONSOL</em> // v9.0</div>
-    <div style="margin-left:auto; display:flex; gap:15px;">
-      <select id="mic-in" style="width:180px; font-size:10px; padding:5px;"></select>
-      <button class="btn" onclick="document.getElementById('bg-upload').click()">BG LOAD</button>
+    <div style="font-weight:900; font-size:20px;">STUDIO<em>CONSOL</em> // v9.5 PRO</div>
+    <div style="margin-left:auto; display:flex; gap:20px;">
+      <select id="mic-in" style="width:200px; padding:8px; border-radius:4px; border:1px solid var(--border); font-size:12px;"></select>
+      <button class="btn" style="padding:5px 15px;" onclick="document.getElementById('bg-upload').click()">STAGE CONFIG</button>
       <input type="file" id="bg-upload" hidden accept="image/*,video/*" onchange="changeBG(this)">
     </div>
   </header>
+
   <main>
     <section id="stage">
       <div id="bg-container"></div>
-      <div id="lyric-display">READY TO SING</div>
-      <div id="producer-comment" style="display:none; margin-top:20px; padding:15px; background:rgba(30,41,59,0.9); color:white; border-radius:8px; font-size:12px; z-index:2; border-left:4px solid var(--gold); max-width:80%;"></div>
-      <div id="yt-player-wrap" style="position: absolute; bottom: 20px; right: 20px; width: 320px; aspect-ratio: 16/9; background: #000; display:none; z-index: 5;"></div>
+      <div id="lyric-display">
+        <span id="main-msg">READY FOR RECORDING</span>
+        <span id="combo-view">COMBO 0</span>
+      </div>
+      <div id="producer-comment"></div>
+      <div id="yt-player-wrap" style="position: absolute; bottom: 30px; right: 30px; width: 360px; aspect-ratio: 16/9; background: #000; display:none; border-radius: 8px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.5);"></div>
     </section>
+
     <aside>
       <div class="card">
+        <span class="label">LIVE PERFORMANCE SCORE</span>
         <div class="score-lcd" id="score-num">00.00</div>
-        <canvas id="viz" style="margin-top:10px;"></canvas>
+        <canvas id="viz"></canvas>
       </div>
 
       <div class="card">
+        <span class="label">AUDIO CONSOLE</span>
         <div class="fx-control">
-          <label>ECHO DEPTH <span id="val-echo">35</span>%</label>
-          <input type="range" id="slip-echo" min="0" max="90" value="35" oninput="updateFX()">
+          <label>ECHO LEVEL <span id="val-echo">30</span>%</label>
+          <input type="range" id="slip-echo" min="0" max="80" value="30" oninput="updateFX()">
         </div>
         <div class="fx-control">
-          <label>ECHO TIME <span id="val-time">0.25</span>s</label>
-          <input type="range" id="slip-time" min="0.05" max="1.0" step="0.05" value="0.25" oninput="updateFX()">
+          <label>ROOM SIZE <span id="val-time">0.2</span>s</label>
+          <input type="range" id="slip-time" min="0.05" max="0.8" step="0.05" value="0.2" oninput="updateFX()">
         </div>
         <div class="fx-control">
-          <label>MONITOR VOL <span id="val-mon">80</span>%</label>
-          <input type="range" id="slip-mon" min="0" max="100" value="80" oninput="updateFX()">
+          <label>OUTPUT GAIN <span id="val-mon">85</span>%</label>
+          <input type="range" id="slip-mon" min="0" max="100" value="85" oninput="updateFX()">
         </div>
       </div>
 
       <div class="card">
-        <input type="text" id="q" placeholder="曲名を検索" style="width:100%; padding:8px; margin-bottom:8px; border-radius:4px; border:1px solid var(--border);">
-        <button class="btn" style="width:100%;" onclick="window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(document.getElementById('q').value+' カラオケ'),'_blank')">YouTubeで探す</button>
+        <span class="label">MEDIA SOURCE</span>
+        <input type="text" id="q" placeholder="Search Song/Artist" style="width:100%; padding:10px; margin-bottom:10px; border-radius:4px; border:1px solid var(--border);">
+        <button class="btn" style="width:100%; margin-bottom:10px;" onclick="window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(document.getElementById('q').value+' カラオケ'),'_blank')">FIND ON YOUTUBE</button>
+        <input type="text" id="v-url" placeholder="Paste YouTube URL" style="width:100%; padding:10px; margin-bottom:10px; border-radius:4px; border:1px solid var(--border);">
+        <button class="btn" style="width:100%;" onclick="loadVideo()">MOUNT VIDEO</button>
       </div>
-      <div class="card">
-        <input type="text" id="v-url" placeholder="動画URLをペースト" style="width:100%; padding:8px; margin-bottom:8px; border-radius:4px; border:1px solid var(--border);">
-        <button class="btn" style="width:100%;" onclick="loadVideo()">動画読込</button>
-      </div>
+
       <button id="start-btn" class="btn" onclick="masterAction()">MASTER START</button>
     </aside>
   </main>
@@ -96,77 +107,79 @@ canvas { width: 100%; height: 50px; background: #0f172a; border-radius: 2px; }
 <script>
 const PASS = 'yoha_88ku99_channnnnn';
 let ctx, mic, anl, dlyL, dlyR, fbL, fbR, mon, stream, recorder, chunks = [];
-let active = false, maxScore = 0;
+let active = false, maxScore = 0, currentCombo = 0, peakCombo = 0, startTime = 0;
 
 async function unlock() {
-  if (document.getElementById('access-input').value !== PASS) return alert("PASS ERROR");
+  if (document.getElementById('access-input').value !== PASS) return alert("ACCESS DENIED");
   try {
-    const dummy = await navigator.mediaDevices.getUserMedia({ audio: true });
-    dummy.getTracks().forEach(t => t.stop());
+    const d = await navigator.mediaDevices.getUserMedia({ audio: true });
+    d.getTracks().forEach(t => t.stop());
     document.getElementById('gate').style.display = 'none';
-    await refreshMics();
-  } catch (e) { alert("マイク許可が必要です"); }
+    await refreshDevices();
+  } catch (e) { alert("PERMISSION ERROR"); }
 }
 
-async function refreshMics() {
+async function refreshDevices() {
   const ds = await navigator.mediaDevices.enumerateDevices();
   const sel = document.getElementById('mic-in');
   sel.innerHTML = "";
   ds.filter(d => d.kind === 'audioinput').forEach(d => {
-    const o = document.createElement('option'); o.value = d.deviceId; o.textContent = d.label || "USB MIC";
-    if(d.label.includes('Sony') || d.label.includes('UAB-80')) o.selected = true;
+    const o = document.createElement('option'); o.value = d.deviceId;
+    o.textContent = d.label || "External Input";
+    if(d.label.includes('Sony') || d.label.includes('UAB-80') || d.label.includes('Built-in')) o.selected = true;
     sel.appendChild(o);
   });
 }
 
-function loadVideo() {
-  const url = document.getElementById('v-url').value;
-  const vid = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('be/')[1];
-  if (vid) {
-    const w = document.getElementById('yt-player-wrap'); w.style.display = 'block';
-    w.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${vid}?autoplay=1" frameborder="0" allow="autoplay; fullscreen"></iframe>`;
-    document.getElementById('lyric-display').textContent = "動画ロード完了";
-  }
-}
-
 async function setupAudio() {
   if (ctx) await ctx.close();
-  const deviceId = document.getElementById('mic-in').value;
-  stream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: deviceId ? { exact: deviceId } : undefined } });
-  ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const devId = document.getElementById('mic-in').value;
+  stream = await navigator.mediaDevices.getUserMedia({ 
+    audio: { 
+      deviceId: devId ? { exact: devId } : undefined,
+      echoCancellation: false, 
+      noiseSuppression: false,
+      autoGainControl: false
+    } 
+  });
+
+  // 低遅延設定でAudioContextを初期化
+  ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
   mic = ctx.createMediaStreamSource(stream);
-  anl = ctx.createAnalyser();
+  anl = ctx.createAnalyser(); anl.fftSize = 1024;
   mon = ctx.createGain();
   dlyL = ctx.createDelay(); dlyR = ctx.createDelay();
   fbL = ctx.createGain(); fbR = ctx.createGain();
+  
   const dest = ctx.createMediaStreamDestination();
   mic.connect(anl); mic.connect(mon);
   mic.connect(dlyL); dlyL.connect(fbL); fbL.connect(dlyR); dlyR.connect(fbR); fbR.connect(dlyL);
   [mon, dlyL, dlyR].forEach(n => { n.connect(ctx.destination); n.connect(dest); });
-  recorder = new MediaRecorder(dest.stream);
+
+  recorder = new MediaRecorder(dest.stream, { mimeType: 'audio/webm;codecs=opus' });
   recorder.ondataavailable = e => chunks.push(e.data);
   recorder.onstop = () => {
     const b = new Blob(chunks, { type: 'audio/webm' }); chunks = [];
-    const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'recording.webm'; a.click();
-    showAdvice();
+    const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'archive_'+Date.now()+'.webm'; a.click();
+    showProAdvice();
   };
   updateFX();
 }
 
 function updateFX() {
-  const echoVal = document.getElementById('slip-echo').value;
-  const timeVal = document.getElementById('slip-time').value;
-  const monVal = document.getElementById('slip-mon').value;
-  document.getElementById('val-echo').textContent = echoVal;
-  document.getElementById('val-time').textContent = timeVal;
-  document.getElementById('val-mon').textContent = monVal;
+  const e = document.getElementById('slip-echo').value;
+  const t = document.getElementById('slip-time').value;
+  const m = document.getElementById('slip-mon').value;
+  document.getElementById('val-echo').textContent = e;
+  document.getElementById('val-time').textContent = t;
+  document.getElementById('val-mon').textContent = m;
   if (ctx) {
-    const g = echoVal / 100;
-    fbL.gain.setTargetAtTime(g, ctx.currentTime, 0.1);
-    fbR.gain.setTargetAtTime(g, ctx.currentTime, 0.1);
-    dlyL.delayTime.setTargetAtTime(parseFloat(timeVal), ctx.currentTime, 0.1);
-    dlyR.delayTime.setTargetAtTime(parseFloat(timeVal) * 1.5, ctx.currentTime, 0.1);
-    mon.gain.setTargetAtTime(monVal / 100, ctx.currentTime, 0.1);
+    const g = e / 100;
+    fbL.gain.setTargetAtTime(g, ctx.currentTime, 0.05);
+    fbR.gain.setTargetAtTime(g, ctx.currentTime, 0.05);
+    dlyL.delayTime.setTargetAtTime(parseFloat(t), ctx.currentTime, 0.05);
+    dlyR.delayTime.setTargetAtTime(parseFloat(t) * 1.4, ctx.currentTime, 0.05);
+    mon.gain.setTargetAtTime(m / 100, ctx.currentTime, 0.05);
   }
 }
 
@@ -176,10 +189,11 @@ function masterAction() {
     active = false; recorder.stop(); btn.textContent = "MASTER START"; btn.style.background = "#10b981";
   } else {
     setupAudio().then(() => {
-      active = true; recorder.start(); btn.textContent = "STOP & SAVE"; btn.style.background = "#ef4444";
+      active = true; recorder.start(); btn.textContent = "STOP & ARCHIVE"; btn.style.background = "#ef4444";
       document.getElementById('producer-comment').style.display = "none";
-      maxScore = 0; loop();
-    }).catch(e => alert("MIC ERROR"));
+      document.getElementById('main-msg').textContent = "ON AIR";
+      maxScore = 0; currentCombo = 0; peakCombo = 0; startTime = Date.now(); loop();
+    });
   }
 }
 
@@ -187,18 +201,54 @@ function loop() {
   if (!active) return; requestAnimationFrame(loop);
   const d = new Float32Array(anl.fftSize); anl.getFloatTimeDomainData(d);
   const rms = Math.sqrt(d.reduce((a,b)=>a+b*b,0)/d.length);
-  const vol = Math.min(rms * 500, 100);
-  if(vol > maxScore) maxScore = vol;
+  const vol = Math.min(rms * 550, 100);
+  
+  if (vol > 10) {
+    currentCombo++;
+    if (currentCombo > peakCombo) peakCombo = currentCombo;
+  } else {
+    currentCombo = 0;
+  }
+
+  if (vol > maxScore) maxScore = vol;
   document.getElementById('score-num').textContent = vol.toFixed(2);
+  document.getElementById('combo-view').textContent = `COMBO ${currentCombo}`;
+  
   const cc = document.getElementById('viz').getContext('2d');
-  cc.clearRect(0,0,300,50); cc.beginPath(); cc.strokeStyle = '#10b981';
-  for(let i=0; i<d.length; i++) cc.lineTo(i*(300/d.length), (d[i]*0.5+0.5)*50); cc.stroke();
+  cc.clearRect(0,0,300,60); cc.beginPath(); cc.lineWidth = 2; cc.strokeStyle = '#10b981';
+  for(let i=0; i<d.length; i++) cc.lineTo(i*(300/d.length), (d[i]*0.5+0.5)*60); cc.stroke();
 }
 
-function showAdvice() {
-  const c = document.getElementById('producer-comment'); c.style.display = "block";
-  let msg = maxScore > 70 ? "プロ級の響きだ！" : (maxScore > 40 ? "悪くない、もっと魂を込めろ！" : "まずは大きな声を出すことから始めよう。");
-  c.textContent = "PRODUCER: " + msg;
+function showProAdvice() {
+  const c = document.getElementById('producer-comment');
+  const m = document.getElementById('main-msg');
+  c.style.display = "block";
+  const duration = (Date.now() - startTime) / 1000;
+  
+  let title = "", body = "";
+  if (maxScore > 85 && peakCombo > 200) {
+    title = "【伝説級のステージだ】";
+    body = `圧倒されたよ。最高スコア${maxScore.toFixed(1)}点、そして${peakCombo}コンボの安定感。君の声はSonyの機材を鳴らしきっている。このまま配信しても即戦力だ。ビブラートの制御も完璧に近い。`;
+  } else if (maxScore > 60) {
+    title = "【ポテンシャルは高い】";
+    body = `いいエネルギーだ。特に中盤の伸びは素晴らしい。ただ、後半で少しスタミナが切れたか？ ${peakCombo}コンボまで行けたのは自信を持っていい。エコーの調整もセンスを感じるぞ。`;
+  } else {
+    title = "【基礎を固めよう】";
+    body = `まずはマイクへの声の当て方を見直そう。波形にバラツキがある。声量は${maxScore.toFixed(1)}まで出ているから、あとはそれを一定に保つトレーニングが必要だ。自分を信じて喉を開け。`;
+  }
+  
+  m.textContent = title;
+  c.innerHTML = `<strong>PRODUCER INSIGHT:</strong><br>${body}`;
+}
+
+function loadVideo() {
+  const url = document.getElementById('v-url').value;
+  const vid = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('be/')[1].split('?')[0];
+  if (vid) {
+    const w = document.getElementById('yt-player-wrap'); w.style.display = 'block';
+    w.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${vid}?autoplay=1" frameborder="0" allow="autoplay; fullscreen"></iframe>`;
+    document.getElementById('main-msg').textContent = "STANDBY";
+  }
 }
 
 function changeBG(input) {
