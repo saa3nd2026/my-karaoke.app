@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>SCX MOBILE // v12.5</title>
+<title>SCX MOBILE // v13.0</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&family=JetBrains+Mono:wght@500&family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
 <style>
-:root { --bg: #020617; --panel: #0f172a; --accent: #3b82f6; --text: #f8fafc; --lcd: #2dd4bf; --border: #1e293b; --gold: #fbbf24; }
+:root { --bg: #020617; --panel: #0f172a; --accent: #3b82f6; --text: #f8fafc; --lcd: #2dd4bf; --red: #f43f5e; --border: #1e293b; --gold: #fbbf24; }
 * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
 body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
@@ -20,41 +20,37 @@ header { padding: 10px 15px; background: #000; border-bottom: 1px solid var(--bo
 main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
 /* ステージ */
-#stage { height: 40%; min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; padding: 15px; background: #000; }
+#stage { height: 35%; min-height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; padding: 10px; background: #000; }
 #bg-container { position: absolute; inset: 0; z-index: 1; opacity: 0.3; }
 #bg-container img, #bg-container video { width: 100%; height: 100%; object-fit: cover; }
 
-#lyric-display { z-index: 2; width: 100%; background: rgba(15,23,42,0.85); padding: 15px; border-radius: 12px; text-align: center; border-bottom: 3px solid var(--accent); }
-.msg-main { font-size: 20px; font-weight: 900; display: block; }
+#lyric-display { z-index: 2; width: 90%; background: rgba(15,23,42,0.9); padding: 15px; border-radius: 12px; text-align: center; border-bottom: 3px solid var(--accent); }
+.msg-main { font-size: 18px; font-weight: 900; display: block; }
 
-/* YouTube操作パネルの改善 */
-#yt-container { position: absolute; top: 10px; right: 10px; z-index: 20; transition: 0.3s; width: 140px; aspect-ratio: 16/9; }
-#yt-container.expanded { width: 90vw; top: 50%; left: 50%; transform: translate(-50%, -50%); height: auto; box-shadow: 0 0 100px rgba(0,0,0,0.9); }
-#yt-player-wrap { width: 100%; height: 100%; background: #000; border-radius: 8px; overflow: hidden; border: 2px solid var(--border); }
-.yt-toggle { position: absolute; top: -10px; left: -10px; background: var(--accent); color: white; border-radius: 50%; width: 24px; height: 24px; border: none; font-size: 12px; font-weight: 900; box-shadow: 0 2px 10px rgba(0,0,0,0.5); display: none; }
+/* YouTube操作パネル */
+#yt-overlay { position: absolute; top: 10px; right: 10px; z-index: 20; width: 120px; aspect-ratio: 16/9; transition: 0.3s; }
+#yt-overlay.expanded { width: 90vw; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; box-shadow: 0 0 100px #000; }
+#yt-player-wrap { width: 100%; height: 100%; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+#yt-expand-btn { position: absolute; top: -10px; left: -10px; background: var(--gold); border-radius: 50%; width: 28px; height: 28px; border: none; font-weight: 900; z-index: 101; display: none; }
 
 /* コントロール */
-aside { flex: 1; background: var(--panel); overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; border-top: 1px solid var(--border); }
+aside { flex: 1; background: var(--panel); overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--border); }
 .card { background: #000; border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
-.score-lcd { font-family: 'JetBrains Mono'; font-size: 36px; color: var(--lcd); text-align: center; border: 1px solid var(--lcd); border-radius: 6px; padding: 5px; }
+.score-lcd { font-family: 'JetBrains Mono'; font-size: 32px; color: var(--lcd); text-align: center; border: 1px solid var(--lcd); border-radius: 6px; }
 
-.fx-row { display: flex; flex-direction: column; gap: 5px; margin-top: 8px; }
-.fx-row label { display: flex; justify-content: space-between; font-size: 10px; color: #64748b; }
-input[type="range"] { accent-color: var(--accent); height: 35px; }
-
-.btn { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 700; color: white; background: #1e293b; }
+.btn { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 700; color: white; background: #1e293b; font-size: 11px; }
 .btn-active { background: var(--accent) !important; }
-.btn-danger { background: #334155; color: #94a3b8; }
-.btn-danger.active { background: var(--red) !important; color: white !important; }
+.btn-warning { border: 1px solid var(--red); color: var(--red); }
+.btn-warning.btn-active { background: var(--red) !important; color: white !important; }
 
-#start-btn { height: 64px; font-size: 18px; background: #059669; font-weight: 900; margin-bottom: 30px; }
+#start-btn { height: 60px; font-size: 18px; background: #059669; font-weight: 900; margin-bottom: 20px; }
 </style>
 </head>
 <body>
 
 <div id="gate">
   <div class="gate-card">
-    <h2 style="color:var(--accent); margin-bottom:15px;">SCX MOBILE v12.5</h2>
+    <h2 style="color:var(--accent); margin-bottom:15px;">SCX MOBILE v13.0</h2>
     <input type="password" id="access-input" placeholder="PASSCODE" style="width:100%; padding:15px; text-align:center; background:#000; color:white; border:1px solid var(--border); border-radius:8px; margin-bottom:20px;">
     <button class="btn" style="background:var(--accent); height:50px;" onclick="unlock()">STUDIO START</button>
   </div>
@@ -62,42 +58,36 @@ input[type="range"] { accent-color: var(--accent); height: 35px; }
 
 <div id="app">
   <header>
-    <div class="logo">SCX MOBILE // v12.5</div>
+    <div class="logo">SCX MOBILE // v13.0</div>
     <select id="mic-in" style="max-width:140px; background:#000; color:white; border:1px solid var(--border); font-size:10px; padding:4px; border-radius:4px;"></select>
   </header>
 
   <main>
     <section id="stage">
       <div id="bg-container"></div>
-      
-      <!-- YouTubeコンテナ：拡大ボタン付き -->
-      <div id="yt-container">
-        <button class="yt-toggle" id="yt-expand" onclick="toggleYT()">＋</button>
+      <div id="yt-overlay">
+        <button id="yt-expand-btn" onclick="toggleYT()">＋</button>
         <div id="yt-player-wrap"></div>
       </div>
-
       <div id="lyric-display">
         <span class="msg-main" id="main-msg">STANDBY</span>
-        <span id="combo-info" style="font-size:10px; color:var(--gold);">READY TO SING</span>
+        <span id="sub-msg" style="font-size:10px; color:var(--gold);">HYBRID ANALYZER READY</span>
       </div>
     </section>
 
     <aside>
       <div class="card">
         <div class="score-lcd" id="score-num">00.00</div>
-        <canvas id="viz" style="width:100%; height:40px; background:#000; margin-top:8px; border-radius:4px;"></canvas>
+        <canvas id="viz" style="width:100%; height:35px; background:#000; margin-top:8px; border-radius:4px;"></canvas>
+      </div>
+
+      <div class="card" style="display:flex; gap:8px;">
+        <button id="tog-mon" class="btn btn-warning" onclick="toggleFX('mon')">MONITOR: OFF</button>
+        <button id="tog-echo" class="btn btn-warning" onclick="toggleFX('echo')">ECHO: OFF</button>
       </div>
 
       <div class="card">
-        <div style="display:flex; gap:8px;">
-          <button id="tog-mon" class="btn btn-danger" onclick="toggleFeature('mon')">MONITOR: OFF</button>
-          <button id="tog-echo" class="btn btn-active" onclick="toggleFeature('echo')">ECHO: ON</button>
-        </div>
-        <p style="font-size:8px; color:var(--red); margin-top:5px;">※スピーカー時はMONITORを必ずOFFにしてください</p>
-      </div>
-
-      <div class="card">
-        <input type="text" id="v-url" class="input-field" style="width:100%; padding:12px; background:#111; color:white; border:1px solid var(--border); border-radius:6px; margin-bottom:10px; font-size:14px;" placeholder="YouTube URL">
+        <input type="text" id="v-url" style="width:100%; padding:12px; background:#111; color:white; border:1px solid var(--border); border-radius:6px; margin-bottom:10px; font-size:14px;" placeholder="YouTube URLを貼り付け">
         <button class="btn" style="background:var(--accent);" onclick="loadVideo()">動画を読み込む</button>
       </div>
 
@@ -108,8 +98,8 @@ input[type="range"] { accent-color: var(--accent); height: 35px; }
 
 <script>
 const PASS = 'yoha_88ku99_channnnnn';
-let ctx, mic, anl, dlyL, fbL, mon, stream, recorder, chunks = [], active = false;
-let feats = { mon: false, echo: true };
+let ctx, mic, anl, dlyL, fbL, mon, stream, recorder, chunks = [], active = false, sessionMax = 0;
+let feats = { mon: false, echo: false };
 
 async function unlock() {
   if (document.getElementById('access-input').value !== PASS) return alert("PASS ERROR");
@@ -118,7 +108,10 @@ async function unlock() {
     s.getTracks().forEach(t => t.stop());
     document.getElementById('gate').style.display = 'none';
     await listMics();
-  } catch (e) { alert("マイク許可が必要です"); }
+    // モバイルのサウンド制限解除
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    ctx.resume();
+  } catch (e) { alert("マイクの許可が必要です。"); }
 }
 
 async function listMics() {
@@ -136,83 +129,92 @@ function loadVideo() {
   const vid = url.includes('v=') ? url.split('v=')[1].split('&')[0] : (url.includes('be/') ? url.split('be/')[1].split('?')[0] : "");
   if (vid) {
     const w = document.getElementById('yt-player-wrap');
-    document.getElementById('yt-expand').style.display = 'block';
-    w.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${vid}?autoplay=0" frameborder="0" allow="autoplay; fullscreen"></iframe>`;
-    document.getElementById('main-msg').textContent = "MOUNTED";
+    document.getElementById('yt-expand-btn').style.display = 'block';
+    w.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${vid}?autoplay=0" frameborder="0"></iframe>`;
+    // 読み込み時に拡大して操作しやすくする
+    const ov = document.getElementById('yt-overlay');
+    ov.classList.add('expanded');
+    document.getElementById('yt-expand-btn').textContent = '－';
   }
 }
 
-// 動画の拡大・縮小
 function toggleYT() {
-  const container = document.getElementById('yt-container');
-  const btn = document.getElementById('yt-expand');
-  container.classList.toggle('expanded');
-  btn.textContent = container.classList.contains('expanded') ? '－' : '＋';
+  const ov = document.getElementById('yt-overlay');
+  const btn = document.getElementById('yt-expand-btn');
+  ov.classList.toggle('expanded');
+  btn.textContent = ov.classList.contains('expanded') ? '－' : '＋';
 }
 
 async function initAudio() {
   if (ctx) await ctx.close();
   const devId = document.getElementById('mic-in').value;
   
-  // ── ハウリング対策：スピーカー時はシステムのエコーキャンセルを強めに要求 ──
+  // ブラウザ側のエコー除去を最大化
   stream = await navigator.mediaDevices.getUserMedia({ 
     audio: { 
       deviceId: devId ? { exact: devId } : undefined,
-      echoCancellation: true, // ここを強制ON
-      noiseSuppression: true,
-      autoGainControl: true
+      echoCancellation: true,
+      noiseSuppression: true
     } 
   });
 
   ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
   mic = ctx.createMediaStreamSource(stream);
-  anl = ctx.createAnalyser(); anl.fftSize = 1024;
-  mon = ctx.createGain(); 
-  dlyL = ctx.createDelay(); fbL = ctx.createGain();
+  anl = ctx.createAnalyser(); anl.fftSize = 512;
+  mon = ctx.createGain(); mon.gain.value = 0;
+  dlyL = ctx.createDelay(); fbL = ctx.createGain(); fbL.gain.value = 0;
   
   const dest = ctx.createMediaStreamDestination();
   
+  // 1. 採点用
   mic.connect(anl);
-  mic.connect(mon); // MONITORING用
-  mic.connect(dlyL); // ECHO用
-  dlyL.connect(fbL); 
-  fbL.connect(dlyL);
   
-  // ── 回路の遮断ロジックの徹底 ──
-  [mon, dlyL].forEach(n => {
-    n.connect(ctx.destination);
-    n.connect(dest);
-  });
+  // 2. モニター・エコー（スイッチがONの時のみ接続される）
+  updateRouting(dest);
   
   recorder = new MediaRecorder(dest.stream);
   recorder.ondataavailable = e => chunks.push(e.data);
   recorder.onstop = () => {
-    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(chunks)); a.download = 'rec.webm'; a.click();
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(chunks)); a.download = 'session.webm'; a.click();
     chunks = [];
   };
-  updateFX();
 }
 
-function toggleFeature(f) {
+function updateRouting(dest) {
+  // すべて一度切断してから繋ぎ直す
+  try { mic.disconnect(mon); mon.disconnect(ctx.destination); } catch(e){}
+  try { mic.disconnect(dlyL); dlyL.disconnect(ctx.destination); } catch(e){}
+
+  if (feats.mon) {
+    mic.connect(mon);
+    mon.connect(ctx.destination);
+    mon.gain.setTargetAtTime(0.7, ctx.currentTime, 0.05);
+  }
+  
+  if (feats.echo) {
+    mic.connect(dlyL);
+    dlyL.connect(fbL);
+    fbL.connect(dlyL);
+    dlyL.connect(ctx.destination);
+    fbL.gain.setTargetAtTime(0.3, ctx.currentTime, 0.05);
+    dlyL.delayTime.setTargetAtTime(0.25, ctx.currentTime, 0.05);
+  }
+
+  // 録音用には常に繋いでおく（Gain 0なら無音として混ざる）
+  mon.connect(dest);
+  dlyL.connect(dest);
+}
+
+function toggleFX(f) {
   feats[f] = !feats[f];
   const btn = document.getElementById('tog-' + f);
   btn.classList.toggle('btn-active', feats[f]);
-  if (f === 'mon') {
-    btn.classList.toggle('active', feats[f]);
-    btn.textContent = `MONITOR: ${feats[f] ? 'ON' : 'OFF'}`;
-  } else {
-    btn.textContent = `ECHO: ${feats[f] ? 'ON' : 'OFF'}`;
+  btn.textContent = f === 'mon' ? `MONITOR: ${feats[f] ? 'ON' : 'OFF'}` : `ECHO: ${feats[f] ? 'ON' : 'OFF'}`;
+  
+  if (feats.mon || feats.echo) {
+    alert("【警告】イヤホンなしでONにするとハウリングが発生します！");
   }
-  updateFX();
-}
-
-function updateFX() {
-  if (!ctx) return;
-  // ハウリング防止のため、MONITORがOFFの時はGainを完全に0にする
-  mon.gain.setTargetAtTime(feats.mon ? 0.8 : 0, ctx.currentTime, 0.05);
-  // エコーもハウリングの原因になるため、OFF時は完全に切断
-  fbL.gain.setTargetAtTime(feats.echo ? 0.3 : 0, ctx.currentTime, 0.05);
-  dlyL.delayTime.setTargetAtTime(0.25, ctx.currentTime, 0.05);
+  if (active) initAudio(); // リアルタイムに反映
 }
 
 function toggleSession() {
@@ -222,6 +224,7 @@ function toggleSession() {
   } else {
     initAudio().then(() => {
       active = true; recorder.start(); btn.textContent = "STOP & SAVE"; btn.style.background = "#f43f5e";
+      document.getElementById('main-msg').textContent = "ON AIR";
       loop();
     });
   }
@@ -231,10 +234,20 @@ function loop() {
   if (!active) return; requestAnimationFrame(loop);
   const tData = new Float32Array(anl.fftSize); anl.getFloatTimeDomainData(tData);
   const rms = Math.sqrt(tData.reduce((a,b)=>a+b*b,0)/tData.length);
-  document.getElementById('score-num').textContent = (rms * 450).toFixed(2);
+  document.getElementById('score-num').textContent = (rms * 400).toFixed(2);
   const cc = document.getElementById('viz').getContext('2d');
-  cc.clearRect(0,0,300,40); cc.beginPath(); cc.strokeStyle = '#2dd4bf';
-  for(let i=0; i<tData.length; i++) cc.lineTo(i*(300/tData.length), (tData[i]*0.5+0.5)*40); cc.stroke();
+  cc.clearRect(0,0,300,35); cc.beginPath(); cc.strokeStyle = '#2dd4bf';
+  for(let i=0; i<tData.length; i++) cc.lineTo(i*(300/tData.length), (tData[i]*0.5+0.5)*35); cc.stroke();
+}
+
+function changeBG(input) {
+  const f = input.files[0]; if (!f) return;
+  const u = URL.createObjectURL(f); const c = document.getElementById('bg-container'); c.innerHTML = "";
+  if (f.type.startsWith('video')) {
+    const v = document.createElement('video'); v.src = u; v.autoplay = v.loop = v.muted = true; c.appendChild(v);
+  } else {
+    const i = document.createElement('img'); i.src = u; c.appendChild(i);
+  }
 }
 </script>
 </body>
