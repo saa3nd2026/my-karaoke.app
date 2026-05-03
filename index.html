@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>STUDIO CONSOL // v6.4</title>
+<title>STUDIO CONSOL // v8.1</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@500&family=Noto+Sans+JP:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -14,39 +14,32 @@
 body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; overflow: hidden; height: 100vh; }
 
 #app { display: flex; flex-direction: column; height: 100vh; }
-header { padding: 12px 24px; display: flex; align-items: center; background: var(--panel-dark); border-bottom: 2px solid var(--border); gap: 20px; }
+header { padding: 12px 24px; display: flex; align-items: center; background: var(--panel-dark); border-bottom: 2px solid var(--border); gap: 20px; z-index: 10; }
 .logo { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; }
 .logo em { color: var(--accent); font-style: normal; }
 
 main { flex: 1; display: grid; grid-template-columns: 1fr 340px; overflow: hidden; }
 
-#stage { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; background: #fff; position: relative; }
-#lyric-display { font-size: clamp(18px, 3.5vw, 32px); font-weight: 700; text-align: center; border-bottom: 4px solid var(--panel-dark); padding: 20px; min-height: 120px; display: flex; align-items: center; z-index: 2; width: 80%; }
+/* ── ステージ ── */
+#stage { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; position: relative; overflow: hidden; background: #fff; }
+#bg-container { position: absolute; inset: 0; z-index: 1; pointer-events: none; display: flex; justify-content: center; align-items: center; }
+#bg-container img, #bg-container video { width: 100%; height: 100%; object-fit: cover; opacity: 0.35; }
 
-#guide-box {
-  margin-top: 24px; padding: 20px; border: 2px dashed var(--accent); border-radius: 8px;
-  background: rgba(37, 99, 235, 0.05); color: var(--accent); font-size: 14px; line-height: 1.8;
-}
+#lyric-display { font-size: clamp(16px, 3vw, 28px); font-weight: 700; text-align: center; border-bottom: 4px solid var(--panel-dark); padding: 20px; min-height: 120px; display: flex; align-items: center; z-index: 2; width: 85%; background: rgba(255,255,255,0.75); border-radius: 8px; backdrop-filter: blur(4px); }
 
-#status-wrap { position: absolute; top: 40px; right: 40px; text-align: right; font-family: 'JetBrains Mono', monospace; }
+#producer-comment { margin-top: 20px; padding: 15px; background: rgba(30, 41, 59, 0.9); color: #fff; border-radius: 8px; font-size: 13px; max-width: 80%; display: none; border-left: 4px solid var(--gold); z-index: 2; line-height: 1.6; }
+
+#status-wrap { position: absolute; top: 40px; right: 40px; text-align: right; font-family: 'JetBrains Mono', monospace; z-index: 3; }
 #rec-indicator { color: var(--red); font-size: 12px; font-weight: 900; display: none; animation: blink 1s infinite; }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-aside { background: var(--panel); border-left: 2px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
+/* ── サイドパネル ── */
+aside { background: var(--panel); border-left: 2px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; z-index: 10; }
 .card { background: var(--panel-dark); border: 1px solid var(--border); border-radius: 4px; padding: 12px; }
 .label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); margin-bottom: 8px; font-weight: 700; }
+.score-lcd { background: #1e293b; color: var(--lcd); padding: 10px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 42px; text-align: center; box-shadow: inset 0 2px 8px rgba(0,0,0,0.4); text-shadow: 0 0 10px var(--lcd); }
 
-.score-lcd {
-  background: #1e293b; color: var(--lcd); padding: 10px; border-radius: 4px;
-  font-family: 'JetBrains Mono', monospace; font-size: 42px; text-align: center;
-  box-shadow: inset 0 2px 8px rgba(0,0,0,0.4); text-shadow: 0 0 10px var(--lcd);
-}
-
-.btn { 
-  padding: 10px; border: 1px solid var(--border); font-weight: 700; font-size: 11px; 
-  background: #f8fafc; cursor: pointer; border-radius: 4px; box-shadow: 0 3px 0 var(--border);
-  transition: all 0.1s ease; position: relative; top: 0; outline: none;
-}
+.btn { padding: 10px; border: 1px solid var(--border); font-weight: 700; font-size: 11px; background: #f8fafc; cursor: pointer; border-radius: 4px; box-shadow: 0 3px 0 var(--border); transition: all 0.1s ease; position: relative; top: 0; outline: none; }
 .btn:active { top: 2px; box-shadow: 0 1px 0 var(--border); }
 .btn.btn-active { background: var(--accent) !important; color: white !important; top: 3px; box-shadow: inset 0 4px 6px rgba(0,0,0,0.3); transform: scale(0.97); }
 
@@ -65,49 +58,48 @@ canvas { width: 100%; height: 50px; background: #0f172a; border-radius: 2px; }
 
 <div id="app">
   <header>
-    <div class="logo">STUDIO<em>CONSOL</em> // v6.4</div>
+    <div class="logo">STUDIO<em>CONSOL</em> // v8.1</div>
     <div style="margin-left:auto; display:flex; gap:15px; align-items:center;">
-      <div><span style="font-size:8px;">MIC</span><br><select id="mic-in" onchange="initAudio(true)" style="width:140px;"></select></div>
-      <div><span style="font-size:8px;">SPK</span><br><select id="spk-out" style="width:140px;"></select></div>
+      <div><span style="font-size:8px;">MIC SELECT</span><br><select id="mic-in" onchange="initAudio(true)" style="width:160px; font-size:10px;"></select></div>
+      <div style="text-align:center;"><span style="font-size:8px;">STAGE BG</span><br>
+        <button class="btn" style="padding:5px 12px;" onclick="document.getElementById('bg-upload').click()">LOAD</button>
+        <input type="file" id="bg-upload" hidden accept="image/*,video/*" onchange="changeBG(this)">
+      </div>
     </div>
   </header>
 
   <main>
     <section id="stage">
+      <div id="bg-container"></div>
       <div id="status-wrap">
         <div id="rec-indicator">● RECORDING</div>
         <div id="combo-num" style="font-size:48px; font-weight:900; color:var(--gold);">0</div>
       </div>
-      <div id="lyric-display">READY</div>
-      <div id="guide-box">
-        <strong>【 システム安定版 】</strong><br>
-        1. 検索バーに曲名を入力して<strong>「YouTubeへ」</strong>を押す<br>
-        2. URLを貼り付けて<strong>「読込」</strong>を押す（エラー修正済）<br>
-        3. <strong>「MASTER START」</strong>で開始
-      </div>
-      <div id="yt-player-wrap" style="position: absolute; bottom: 20px; right: 20px; width: 320px; aspect-ratio: 16/9; background: #000; display:none; border-radius: 4px; overflow: hidden;"></div>
+      <div id="lyric-display">マイクを選択し、YouTubeで曲を読み込んでください。</div>
+      <div id="producer-comment"></div>
+      <div id="yt-player-wrap" style="position: absolute; bottom: 20px; right: 20px; width: 320px; aspect-ratio: 16/9; background: #000; display:none; border-radius: 4px; overflow: hidden; z-index: 5; box-shadow: 0 10px 25px rgba(0,0,0,0.4);"></div>
     </section>
 
     <aside>
       <div class="card">
-        <div class="label">ANALYZER // 歌唱解析</div>
+        <div class="label">ANALYZER // スコア解析</div>
         <div class="score-lcd" id="score-num">00.00</div>
         <canvas id="viz" style="margin-top:10px;"></canvas>
       </div>
       <div class="card">
-        <div class="label">1. SOURCE // 動画検索</div>
+        <div class="label">1. SOURCE // YouTube検索</div>
         <div style="display:flex; gap:4px; margin-bottom:8px;">
-          <input type="text" id="q" placeholder="曲名や歌手名" style="flex:1; padding:8px; border:1px solid var(--border); border-radius:4px; font-size:11px;">
-          <button class="btn" style="width:100px;" onclick="executeSearch()">YouTubeへ</button>
+          <input type="text" id="q" placeholder="曲名や歌手名" style="flex:1; padding:8px; border-radius:4px; border:1px solid var(--border); font-size:11px;">
+          <button class="btn" onclick="executeSearch()">検索</button>
         </div>
         <div class="label">2. LOAD // 動画読込</div>
         <div style="display:flex; gap:4px;">
-          <input type="text" id="v-url" placeholder="URLを貼り付け" style="flex:1; padding:8px; border:1px solid var(--border); border-radius:4px; font-size:11px;">
+          <input type="text" id="v-url" placeholder="動画URLを貼り付け" style="flex:1; padding:8px; border-radius:4px; border:1px solid var(--border); font-size:11px;">
           <button class="btn" onclick="playByUrl()">読込</button>
         </div>
       </div>
       <div class="card">
-        <div class="label">FX // エフェクト</div>
+        <div class="label">EFFECTOR // 空間演出</div>
         <div style="display: flex; gap: 8px;">
           <button id="tog-mon" class="btn btn-active" style="flex:1" onclick="toggleFeat('mon')">MONITOR</button>
           <button id="tog-echo" class="btn btn-active" style="flex:1" onclick="toggleFeat('echo')">ECHO PRO</button>
@@ -121,9 +113,22 @@ canvas { width: 100%; height: 50px; background: #0f172a; border-radius: 2px; }
 <script>
 const PASS = 'yoha_88ku99_channnnnn';
 let ctx, mic, anl, hp, dlyL, dlyR, fbL, fbR, panL, panR, lpL, lpR, mon, stream, recorder;
-let chunks = [], active = false, feats = { mon: true, echo: true }, currentScore = 0, combo = 0;
+let chunks = [], active = false, feats = { mon: true, echo: true }, currentScore = 0, maxScore = 0, combo = 0;
 
 function auth() { if(document.getElementById('access-input').value === PASS) document.getElementById('gate').style.display='none', loadDevices(); }
+
+function changeBG(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const container = document.getElementById('bg-container');
+  const url = URL.createObjectURL(file);
+  container.innerHTML = ""; 
+  if (file.type.startsWith('video/')) {
+    const v = document.createElement('video'); v.src = url; v.autoplay = true; v.loop = true; v.muted = true; container.appendChild(v);
+  } else {
+    const i = document.createElement('img'); i.src = url; container.appendChild(i);
+  }
+}
 
 function executeSearch() {
   const query = document.getElementById('q').value;
@@ -134,118 +139,98 @@ function executeSearch() {
 async function loadDevices() {
   try {
     const s = await navigator.mediaDevices.getUserMedia({ audio: true });
-    s.getTracks().forEach(t => t.stop()); // 権限確認後即座に停止して警告回避
+    s.getTracks().forEach(t => t.stop());
     const ds = await navigator.mediaDevices.enumerateDevices();
-    const micS = document.getElementById('mic-in'), spkS = document.getElementById('spk-out');
-    micS.innerHTML = ""; spkS.innerHTML = "";
+    const micS = document.getElementById('mic-in');
+    micS.innerHTML = "";
     ds.forEach(d => {
-      const o = document.createElement('option'); o.value = d.deviceId; o.textContent = d.label;
       if (d.kind === 'audioinput') {
+        const o = document.createElement('option'); o.value = d.deviceId; o.textContent = d.label || `MIC ${micS.length + 1}`;
         if(d.label.includes('Sony') || d.label.includes('UAB-80')) o.selected = true;
         micS.appendChild(o);
-      } else if (d.kind === 'audiooutput') spkS.appendChild(o);
+      }
     });
-  } catch(e) { console.error(e); }
+  } catch(e) { alert("マイク使用を許可してください。"); }
 }
 
 function playByUrl() {
   const url = document.getElementById('v-url').value.trim();
-  if(!url) return;
-  let vid = "";
-  if(url.includes('v=')) vid = url.split('v=')[1].split('&')[0];
-  else if(url.includes('be/')) vid = url.split('be/')[1].split('?')[0];
-
+  let vid = url.includes('v=') ? url.split('v=')[1].split('&')[0] : (url.includes('be/') ? url.split('be/')[1].split('?')[0] : "");
   if(vid) {
-    const wrap = document.getElementById('yt-player-wrap');
-    wrap.style.display = 'block';
-    // 修正：Fullscreen ポリシーエラー回避のため allow 属性を強化
-    wrap.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${vid}?autoplay=1" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
-    document.getElementById('lyric-display').textContent = "LOADED";
-    document.getElementById('guide-box').style.display = "none";
-  } else {
-    alert("無効なYouTube URLです");
+    const w = document.getElementById('yt-player-wrap'); w.style.display = 'block';
+    w.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${vid}?autoplay=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+    document.getElementById('lyric-display').textContent = "動画を読み込みました。";
+    document.getElementById('producer-comment').style.display = "none";
   }
 }
 
 async function initAudio(force = false) {
-  if (ctx && !force) return true;
-  // 修正：既存トラックを明示的に停止 (MediaStreamTrack was destroyed... 回避)
+  if (ctx && !force) { if (ctx.state === 'suspended') await ctx.resume(); return true; }
   if (stream) stream.getTracks().forEach(t => t.stop());
-  
   try {
     const id = document.getElementById('mic-in').value;
-    stream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: id ? { exact: id } : undefined, echoCancellation: false } });
+    stream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: id ? { exact: id } : undefined, echoCancellation: false, noiseSuppression: false } });
     ctx = new (window.AudioContext || window.webkitAudioContext)();
-    if (ctx.state === 'suspended') await ctx.resume();
-
     mic = ctx.createMediaStreamSource(stream);
     anl = ctx.createAnalyser();
-    hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 120;
+    hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 110;
     mon = ctx.createGain();
-
-    dlyL = ctx.createDelay(); dlyL.delayTime.value = 0.25;
-    dlyR = ctx.createDelay(); dlyR.delayTime.value = 0.50;
+    dlyL = ctx.createDelay(); dlyL.delayTime.value = 0.25; dlyR = ctx.createDelay(); dlyR.delayTime.value = 0.45;
     fbL = ctx.createGain(); fbR = ctx.createGain();
-    lpL = ctx.createBiquadFilter(); lpL.type = "lowpass"; lpL.frequency.value = 2500;
-    lpR = ctx.createBiquadFilter(); lpR.type = "lowpass"; lpR.frequency.value = 2500;
-    panL = ctx.createPanner(); panL.pan.value = -0.6;
-    panR = ctx.createPanner(); panR.pan.value = 0.6;
-
+    lpL = ctx.createBiquadFilter(); lpL.type = "lowpass"; lpL.frequency.value = 2400; lpR = ctx.createBiquadFilter(); lpR.type = "lowpass"; lpR.frequency.value = 2400;
+    panL = ctx.createPanner(); panL.pan.value = -0.5; panR = ctx.createPanner(); panR.pan.value = 0.5;
     const recDest = ctx.createMediaStreamDestination();
     mic.connect(hp); hp.connect(anl); hp.connect(mon);
     hp.connect(dlyL); dlyL.connect(lpL); lpL.connect(fbL); fbL.connect(panL); fbL.connect(dlyR);
     hp.connect(dlyR); dlyR.connect(lpR); lpR.connect(fbR); fbR.connect(panR); fbR.connect(dlyL);
-    
-    panL.connect(ctx.destination); panL.connect(recDest);
-    panR.connect(ctx.destination); panR.connect(recDest);
-    mon.connect(ctx.destination); mon.connect(recDest);
-
+    [mon, panL, panR].forEach(n => { n.connect(ctx.destination); n.connect(recDest); });
     recorder = new MediaRecorder(recDest.stream);
     recorder.ondataavailable = (e) => { if(e.data.size > 0) chunks.push(e.data); };
     recorder.onstop = () => {
-      const blob = new Blob(chunks, { type: 'audio/webm' });
-      chunks = [];
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'recording.webm'; a.click();
+      const b = new Blob(chunks, { type: 'audio/webm' }); chunks = [];
+      const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'recording.webm'; a.click();
+      generateAdvice();
     };
-
     updateFX();
     return true;
   } catch(e) { return false; }
 }
 
-function toggleFeat(f) {
-  feats[f] = !feats[f];
-  document.getElementById('tog-' + f).classList.toggle('btn-active', feats[f]);
-  updateFX();
+function generateAdvice() {
+  const score = maxScore;
+  const comm = document.getElementById('producer-comment');
+  const disp = document.getElementById('lyric-display');
+  comm.style.display = "block";
+  let msg = "", adv = "";
+  if(score > 85) {
+    msg = "【驚愕の歌唱力】"; adv = "今のテイクは完璧だ。マイクへの声ののせ方がプロそのものだ。このまま録音データを誰かに送りたくなるな。";
+  } else if(score > 60) {
+    msg = "【プロの卵】"; adv = "いい響きだ。サビの爆発力に光るものを感じた。あとは語尾をもう少し丁寧に歌うと、さらに表現力が増すぞ。";
+  } else if(score > 30) {
+    msg = "【原石】"; adv = "ピッチはいい。もっとリラックスして、お腹から声を出すイメージで歌ってみよう。君ならもっと化ける。";
+  } else {
+    msg = "【修行の道】"; adv = "恥ずかしがらずに、自分を解放してマイクにぶつかってこい。喉を開く感覚を掴めれば一気に良くなるぞ。";
+  }
+  disp.textContent = msg;
+  comm.textContent = "PRODUCER COMMENT: " + adv;
 }
 
-function updateFX() {
-  if(!ctx) return;
-  const gain = feats.echo ? 0.35 : 0;
-  fbL.gain.setTargetAtTime(gain, ctx.currentTime, 0.1);
-  fbR.gain.setTargetAtTime(gain, ctx.currentTime, 0.1);
-  mon.gain.setTargetAtTime(feats.mon ? 0.7 : 0, ctx.currentTime, 0.1);
-}
+function toggleFeat(f) { feats[f] = !feats[f]; document.getElementById('tog-' + f).classList.toggle('btn-active', feats[f]); updateFX(); }
+function updateFX() { if(!ctx) return; const g = feats.echo ? 0.35 : 0; fbL.gain.setTargetAtTime(g, ctx.currentTime, 0.1); fbR.gain.setTargetAtTime(g, ctx.currentTime, 0.1); mon.gain.setTargetAtTime(feats.mon ? 0.8 : 0, ctx.currentTime, 0.1); }
 
 function toggle() {
   const btn = document.getElementById('start-btn');
-  const indicator = document.getElementById('rec-indicator');
+  const ind = document.getElementById('rec-indicator');
   if(active) {
-    active = false;
-    if(recorder) recorder.stop();
-    // 停止時にマイクも止める
-    if(stream) stream.getTracks().forEach(t => t.stop());
-    indicator.style.display = 'none';
+    active = false; if(recorder) recorder.stop(); ind.style.display = 'none';
     btn.style.background = "#10b981"; btn.textContent = "MASTER START";
   } else {
     initAudio().then(ok => {
       if(!ok) return;
-      active = true;
-      if(recorder) recorder.start();
-      indicator.style.display = 'block';
-      btn.style.background = "#ef4444"; btn.textContent = "STOP & SAVE";
-      loop();
+      active = true; recorder.start(); ind.style.display = 'block';
+      document.getElementById('producer-comment').style.display = "none";
+      btn.style.background = "#ef4444"; btn.textContent = "STOP & SAVE ARCHIVE";
+      maxScore = 0; loop();
     });
   }
 }
@@ -257,11 +242,11 @@ function loop() {
   const vol = Math.min(rms * 500, 100);
   if(vol > 5) { currentScore = currentScore * 0.96 + vol * 0.04; combo++; }
   else { combo = 0; currentScore *= 0.99; }
+  if(currentScore > maxScore) maxScore = currentScore;
   document.getElementById('score-num').textContent = currentScore.toFixed(2);
   document.getElementById('combo-num').textContent = combo;
   const cv = document.getElementById('viz'), cc = cv.getContext('2d');
-  cc.clearRect(0,0,cv.width,cv.height); cc.beginPath(); cc.strokeStyle = '#10b981';
-  cc.lineWidth = 2;
+  cc.clearRect(0,0,cv.width,cv.height); cc.beginPath(); cc.strokeStyle = '#10b981'; cc.lineWidth = 2;
   for(let i=0; i<d.length; i++) cc.lineTo(i*(cv.width/d.length), (d[i]*0.5+0.5)*cv.height);
   cc.stroke();
 }
