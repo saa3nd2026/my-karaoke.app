@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>STUDIO CONSOL // v8.1</title>
+<title>STUDIO CONSOL // v8.2</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@500&family=Noto+Sans+JP:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -25,7 +25,7 @@ main { flex: 1; display: grid; grid-template-columns: 1fr 340px; overflow: hidde
 #bg-container { position: absolute; inset: 0; z-index: 1; pointer-events: none; display: flex; justify-content: center; align-items: center; }
 #bg-container img, #bg-container video { width: 100%; height: 100%; object-fit: cover; opacity: 0.35; }
 
-#lyric-display { font-size: clamp(16px, 3vw, 28px); font-weight: 700; text-align: center; border-bottom: 4px solid var(--panel-dark); padding: 20px; min-height: 120px; display: flex; align-items: center; z-index: 2; width: 85%; background: rgba(255,255,255,0.75); border-radius: 8px; backdrop-filter: blur(4px); }
+#lyric-display { font-size: clamp(16px, 3vw, 26px); font-weight: 700; text-align: center; border-bottom: 4px solid var(--panel-dark); padding: 20px; min-height: 120px; display: flex; align-items: center; z-index: 2; width: 85%; background: rgba(255,255,255,0.8); border-radius: 8px; backdrop-filter: blur(4px); }
 
 #producer-comment { margin-top: 20px; padding: 15px; background: rgba(30, 41, 59, 0.9); color: #fff; border-radius: 8px; font-size: 13px; max-width: 80%; display: none; border-left: 4px solid var(--gold); z-index: 2; line-height: 1.6; }
 
@@ -33,7 +33,6 @@ main { flex: 1; display: grid; grid-template-columns: 1fr 340px; overflow: hidde
 #rec-indicator { color: var(--red); font-size: 12px; font-weight: 900; display: none; animation: blink 1s infinite; }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-/* ── サイドパネル ── */
 aside { background: var(--panel); border-left: 2px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; z-index: 10; }
 .card { background: var(--panel-dark); border: 1px solid var(--border); border-radius: 4px; padding: 12px; }
 .label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); margin-bottom: 8px; font-weight: 700; }
@@ -51,16 +50,16 @@ canvas { width: 100%; height: 50px; background: #0f172a; border-radius: 2px; }
 
 <div id="gate" style="position:fixed; inset:0; z-index:9999; background:var(--bg); display:flex; align-items:center; justify-content:center;">
   <div style="background:var(--panel); padding:40px; border:2px solid var(--border); border-radius:12px; text-align:center; width:380px;">
-    <div class="logo" style="font-size: 20px; margin-bottom: 24px;">STUDIO<em>CONSOL</em> // LOGIN</div>
-    <input type="password" id="access-input" placeholder="PASSCODE" oninput="auth()" style="width:100%; padding:12px; text-align:center; letter-spacing:4px;">
+    <div class="logo" style="font-size: 20px; margin-bottom: 24px;">STUDIO<em>CONSOL</em> // v8.2</div>
+    <input type="password" id="access-input" placeholder="PASSCODE" oninput="auth()" style="width:100%; padding:12px; text-align:center;">
   </div>
 </div>
 
 <div id="app">
   <header>
-    <div class="logo">STUDIO<em>CONSOL</em> // v8.1</div>
+    <div class="logo">STUDIO<em>CONSOL</em> // v8.2</div>
     <div style="margin-left:auto; display:flex; gap:15px; align-items:center;">
-      <div><span style="font-size:8px;">MIC SELECT</span><br><select id="mic-in" onchange="initAudio(true)" style="width:160px; font-size:10px;"></select></div>
+      <div><span style="font-size:8px;">MIC SELECT</span><br><select id="mic-in" style="width:160px; font-size:10px;"></select></div>
       <div style="text-align:center;"><span style="font-size:8px;">STAGE BG</span><br>
         <button class="btn" style="padding:5px 12px;" onclick="document.getElementById('bg-upload').click()">LOAD</button>
         <input type="file" id="bg-upload" hidden accept="image/*,video/*" onchange="changeBG(this)">
@@ -75,9 +74,9 @@ canvas { width: 100%; height: 50px; background: #0f172a; border-radius: 2px; }
         <div id="rec-indicator">● RECORDING</div>
         <div id="combo-num" style="font-size:48px; font-weight:900; color:var(--gold);">0</div>
       </div>
-      <div id="lyric-display">マイクを選択し、YouTubeで曲を読み込んでください。</div>
+      <div id="lyric-display">マイクを選び、MASTER STARTを押してください。</div>
       <div id="producer-comment"></div>
-      <div id="yt-player-wrap" style="position: absolute; bottom: 20px; right: 20px; width: 320px; aspect-ratio: 16/9; background: #000; display:none; border-radius: 4px; overflow: hidden; z-index: 5; box-shadow: 0 10px 25px rgba(0,0,0,0.4);"></div>
+      <div id="yt-player-wrap" style="position: absolute; bottom: 20px; right: 20px; width: 320px; aspect-ratio: 16/9; background: #000; display:none; border-radius: 4px; overflow: hidden; z-index: 5;"></div>
     </section>
 
     <aside>
@@ -87,14 +86,13 @@ canvas { width: 100%; height: 50px; background: #0f172a; border-radius: 2px; }
         <canvas id="viz" style="margin-top:10px;"></canvas>
       </div>
       <div class="card">
-        <div class="label">1. SOURCE // YouTube検索</div>
+        <div class="label">SOURCE // 連携</div>
         <div style="display:flex; gap:4px; margin-bottom:8px;">
-          <input type="text" id="q" placeholder="曲名や歌手名" style="flex:1; padding:8px; border-radius:4px; border:1px solid var(--border); font-size:11px;">
-          <button class="btn" onclick="executeSearch()">検索</button>
+          <input type="text" id="q" placeholder="曲名を入力" style="flex:1; padding:8px; border-radius:4px; border:1px solid var(--border); font-size:11px;">
+          <button class="btn" onclick="executeSearch()">YouTube</button>
         </div>
-        <div class="label">2. LOAD // 動画読込</div>
         <div style="display:flex; gap:4px;">
-          <input type="text" id="v-url" placeholder="動画URLを貼り付け" style="flex:1; padding:8px; border-radius:4px; border:1px solid var(--border); font-size:11px;">
+          <input type="text" id="v-url" placeholder="URLを貼り付け" style="flex:1; padding:8px; border-radius:4px; border:1px solid var(--border); font-size:11px;">
           <button class="btn" onclick="playByUrl()">読込</button>
         </div>
       </div>
@@ -150,7 +148,7 @@ async function loadDevices() {
         micS.appendChild(o);
       }
     });
-  } catch(e) { alert("マイク使用を許可してください。"); }
+  } catch(e) { console.error(e); }
 }
 
 function playByUrl() {
@@ -164,26 +162,65 @@ function playByUrl() {
   }
 }
 
-async function initAudio(force = false) {
-  if (ctx && !force) { if (ctx.state === 'suspended') await ctx.resume(); return true; }
-  if (stream) stream.getTracks().forEach(t => t.stop());
+// ── 核心：音響システムの初期化と強制接続 ──
+async function initAudioSystem() {
+  // すでに存在していれば閉じて作り直す（リフレッシュ）
+  if (ctx) {
+    await ctx.close();
+  }
+  if (stream) {
+    stream.getTracks().forEach(t => t.stop());
+  }
+
   try {
-    const id = document.getElementById('mic-in').value;
-    stream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: id ? { exact: id } : undefined, echoCancellation: false, noiseSuppression: false } });
+    const deviceId = document.getElementById('mic-in').value;
+    stream = await navigator.mediaDevices.getUserMedia({ 
+      audio: { 
+        deviceId: deviceId ? { exact: deviceId } : undefined,
+        echoCancellation: false, 
+        noiseSuppression: false, 
+        autoGainControl: false 
+      } 
+    });
+
     ctx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // 強制的に再開（ユーザーアクション直後である必要あり）
+    if (ctx.state === 'suspended') {
+      await ctx.resume();
+    }
+
     mic = ctx.createMediaStreamSource(stream);
     anl = ctx.createAnalyser();
     hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 110;
     mon = ctx.createGain();
-    dlyL = ctx.createDelay(); dlyL.delayTime.value = 0.25; dlyR = ctx.createDelay(); dlyR.delayTime.value = 0.45;
+    
+    dlyL = ctx.createDelay(); dlyL.delayTime.value = 0.25;
+    dlyR = ctx.createDelay(); dlyR.delayTime.value = 0.45;
     fbL = ctx.createGain(); fbR = ctx.createGain();
-    lpL = ctx.createBiquadFilter(); lpL.type = "lowpass"; lpL.frequency.value = 2400; lpR = ctx.createBiquadFilter(); lpR.type = "lowpass"; lpR.frequency.value = 2400;
-    panL = ctx.createPanner(); panL.pan.value = -0.5; panR = ctx.createPanner(); panR.pan.value = 0.5;
+    lpL = ctx.createBiquadFilter(); lpL.type = "lowpass"; lpL.frequency.value = 2400;
+    lpR = ctx.createBiquadFilter(); lpR.type = "lowpass"; lpR.frequency.value = 2400;
+    panL = ctx.createPanner(); panL.pan.value = -0.5;
+    panR = ctx.createPanner(); panR.pan.value = 0.5;
+
     const recDest = ctx.createMediaStreamDestination();
-    mic.connect(hp); hp.connect(anl); hp.connect(mon);
+
+    // ── ルーティングの構築 ──
+    mic.connect(hp);
+    hp.connect(anl);
+    hp.connect(mon); // モニター直結
+
+    // ECHO PRO (ピンポン)
     hp.connect(dlyL); dlyL.connect(lpL); lpL.connect(fbL); fbL.connect(panL); fbL.connect(dlyR);
     hp.connect(dlyR); dlyR.connect(lpR); lpR.connect(fbR); fbR.connect(panR); fbR.connect(dlyL);
-    [mon, panL, panR].forEach(n => { n.connect(ctx.destination); n.connect(recDest); });
+    
+    // 出力先（スピーカー & 録音）
+    [mon, panL, panR].forEach(n => {
+      n.connect(ctx.destination);
+      n.connect(recDest);
+    });
+
+    // 録音の準備
     recorder = new MediaRecorder(recDest.stream);
     recorder.ondataavailable = (e) => { if(e.data.size > 0) chunks.push(e.data); };
     recorder.onstop = () => {
@@ -191,9 +228,14 @@ async function initAudio(force = false) {
       const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'recording.webm'; a.click();
       generateAdvice();
     };
+
     updateFX();
     return true;
-  } catch(e) { return false; }
+  } catch(e) {
+    console.error("Audio Init Error:", e);
+    alert("オーディオ回路の構築に失敗しました。マイクの設定を確認してください。");
+    return false;
+  }
 }
 
 function generateAdvice() {
@@ -201,35 +243,44 @@ function generateAdvice() {
   const comm = document.getElementById('producer-comment');
   const disp = document.getElementById('lyric-display');
   comm.style.display = "block";
-  let msg = "", adv = "";
-  if(score > 85) {
-    msg = "【驚愕の歌唱力】"; adv = "今のテイクは完璧だ。マイクへの声ののせ方がプロそのものだ。このまま録音データを誰かに送りたくなるな。";
-  } else if(score > 60) {
-    msg = "【プロの卵】"; adv = "いい響きだ。サビの爆発力に光るものを感じた。あとは語尾をもう少し丁寧に歌うと、さらに表現力が増すぞ。";
-  } else if(score > 30) {
-    msg = "【原石】"; adv = "ピッチはいい。もっとリラックスして、お腹から声を出すイメージで歌ってみよう。君ならもっと化ける。";
-  } else {
-    msg = "【修行の道】"; adv = "恥ずかしがらずに、自分を解放してマイクにぶつかってこい。喉を開く感覚を掴めれば一気に良くなるぞ。";
-  }
+  let msg = score > 85 ? "【伝説のテイク】" : (score > 60 ? "【プロの卵】" : (score > 30 ? "【原石】" : "【修行不足】"));
+  let adv = score > 85 ? "鳥肌が立った。完璧な声量とコントロールだ。" : (score > 60 ? "いい響きだ。サビの爆発力に光るものを感じるぞ。" : "ピッチは安定している。あとは魂を込めて歌うだけだ。");
   disp.textContent = msg;
   comm.textContent = "PRODUCER COMMENT: " + adv;
 }
 
-function toggleFeat(f) { feats[f] = !feats[f]; document.getElementById('tog-' + f).classList.toggle('btn-active', feats[f]); updateFX(); }
-function updateFX() { if(!ctx) return; const g = feats.echo ? 0.35 : 0; fbL.gain.setTargetAtTime(g, ctx.currentTime, 0.1); fbR.gain.setTargetAtTime(g, ctx.currentTime, 0.1); mon.gain.setTargetAtTime(feats.mon ? 0.8 : 0, ctx.currentTime, 0.1); }
+function toggleFeat(f) { 
+  feats[f] = !feats[f]; 
+  document.getElementById('tog-' + f).classList.toggle('btn-active', feats[f]); 
+  updateFX(); 
+}
+
+function updateFX() { 
+  if(!ctx) return; 
+  const g = feats.echo ? 0.35 : 0; 
+  if(fbL) fbL.gain.setTargetAtTime(g, ctx.currentTime, 0.1); 
+  if(fbR) fbR.gain.setTargetAtTime(g, ctx.currentTime, 0.1); 
+  if(mon) mon.gain.setTargetAtTime(feats.mon ? 0.8 : 0, ctx.currentTime, 0.1); 
+}
 
 function toggle() {
   const btn = document.getElementById('start-btn');
   const ind = document.getElementById('rec-indicator');
+  
   if(active) {
-    active = false; if(recorder) recorder.stop(); ind.style.display = 'none';
+    active = false;
+    if(recorder && recorder.state !== 'inactive') recorder.stop();
+    ind.style.display = 'none';
     btn.style.background = "#10b981"; btn.textContent = "MASTER START";
   } else {
-    initAudio().then(ok => {
+    // ボタンをクリックした瞬間に全システムを初期化（セキュリティ突破）
+    initAudioSystem().then(ok => {
       if(!ok) return;
-      active = true; recorder.start(); ind.style.display = 'block';
+      active = true;
+      recorder.start();
+      ind.style.display = 'block';
       document.getElementById('producer-comment').style.display = "none";
-      btn.style.background = "#ef4444"; btn.textContent = "STOP & SAVE ARCHIVE";
+      btn.style.background = "#ef4444"; btn.textContent = "STOP & ARCHIVE";
       maxScore = 0; loop();
     });
   }
