@@ -4,103 +4,148 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<title>STUDIO CONSOLE // v4.5</title>
+<title>STUDIO CONSOLE // v4.7</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@500&family=Noto+Sans+JP:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #e2e8f0; --panel: #f1f5f9; --panel-dark: #cbd5e1; --accent: #2563eb; 
-  --text: #0f172a; --text-dim: #64748b; --lcd: #10b981; --red: #dc2626; --border: #94a3b8;
+  --text: #0f172a; --text-dim: #64748b; --lcd: #10b981; --red: #ef4444; --border: #94a3b8;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; overflow: hidden; height: 100vh; }
+body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
 
-/* ── 押し込みボタンのアニメーション ── */
-.btn { 
-  padding: 10px; border: 1px solid var(--border); font-weight: 700; font-size: 11px; 
-  background: #f8fafc; cursor: pointer; border-radius: 4px;
-  box-shadow: 0 2px 0 var(--border);
-  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative; top: 0;
+#app { display: flex; flex-direction: column; height: 100vh; position: relative; z-index: 1; }
+
+header {
+  padding: 12px 24px; display: flex; align-items: center;
+  background: var(--panel-dark); border-bottom: 2px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5); gap: 20px;
 }
-.btn:active { top: 1px; box-shadow: 0 1px 0 var(--border); }
+.logo { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; }
+.logo em { color: var(--accent); font-style: normal; }
 
-/* ON状態：凹んで、内側に影が入る（PA機材の自照式スイッチ風） */
+main { flex: 1; display: grid; grid-template-columns: 1fr 340px; overflow: hidden; }
+
+/* ── 歌詞ステージ ── */
+#stage {
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  padding: 40px; position: relative; background: #fff;
+}
+#lyric-display {
+  font-size: clamp(20px, 4vw, 36px); font-weight: 700; text-align: center; color: var(--text);
+  padding: 20px; border-bottom: 4px solid var(--panel-dark); min-height: 120px; display: flex; align-items: center;
+}
+
+/* ── 右サイドコンソール ── */
+aside {
+  background: var(--panel); border-left: 2px solid var(--border);
+  padding: 20px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto;
+}
+.card {
+  background: var(--panel-dark); border: 1px solid var(--border);
+  border-radius: 4px; padding: 12px; box-shadow: 1px 1px 0 rgba(255,255,255,0.8);
+}
+.label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); margin-bottom: 8px; font-weight: 700; }
+
+.score-lcd {
+  background: #1e293b; color: var(--lcd); padding: 12px; border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace; font-size: 42px; text-align: center;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.4); text-shadow: 0 0 10px var(--lcd);
+}
+
+/* ── 物理スイッチデザイン ── */
+.btn {
+  padding: 10px 16px; border-radius: 4px; border: 1px solid var(--border); 
+  font-weight: 700; cursor: pointer; font-size: 11px;
+  background: #f8fafc; box-shadow: 0 3px 0 var(--border);
+  transition: all 0.1s ease; position: relative; top: 0; outline: none;
+}
+.btn:active { top: 2px; box-shadow: 0 1px 0 var(--border); }
+
+/* ON状態：深く押し込まれ、内側に影が入る演出 */
 .btn.btn-active { 
-  background: var(--accent); color: white; border-color: #1e40af;
-  top: 2px;
-  box-shadow: inset 0 3px 6px rgba(0,0,0,0.3);
+  background: var(--accent) !important; color: white !important; border-color: #1e40af;
+  top: 3px;
+  box-shadow: inset 0 4px 8px rgba(0,0,0,0.4);
   transform: scale(0.97);
 }
-.btn.btn-active::after {
-  content: ''; position: absolute; inset: 0; 
-  background: rgba(255,255,255,0.1); border-radius: 3px;
+
+#start-btn { 
+  width: 100%; padding: 18px; font-size: 15px; margin-top: auto;
+  background: #10b981; color: white; border: none;
+  box-shadow: 0 4px 0 #059669; font-weight: 900; cursor: pointer;
+}
+#start-btn.btn-active { background: var(--red) !important; box-shadow: inset 0 4px 8px rgba(0,0,0,0.4); }
+
+/* ── パスコード画面 ── */
+#gate {
+  position: fixed; inset: 0; z-index: 9999; background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+}
+.gate-panel {
+  background: var(--panel); padding: 40px; border: 2px solid var(--border);
+  border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  text-align: center; width: 380px;
 }
 
-/* 共通レイアウト */
-#app { display: flex; flex-direction: column; height: 100vh; }
-header { padding: 12px 24px; display: flex; align-items: center; background: var(--panel-dark); border-bottom: 2px solid var(--border); gap: 15px; }
-main { flex: 1; display: grid; grid-template-columns: 1fr 340px; overflow: hidden; }
-#stage { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; background: #fff; position: relative; }
-#lyric-display { font-size: clamp(20px, 4vw, 36px); font-weight: 700; text-align: center; border-bottom: 4px solid var(--panel-dark); padding: 20px; min-height: 120px; }
-aside { background: var(--panel); border-left: 2px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
-.card { background: var(--panel-dark); border: 1px solid var(--border); border-radius: 4px; padding: 12px; }
-.label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); margin-bottom: 6px; font-weight: 700; }
-.score-lcd { background: #1e293b; color: var(--lcd); padding: 10px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 40px; text-align: center; box-shadow: inset 0 2px 8px rgba(0,0,0,0.4); }
+canvas { width: 100%; height: 40px; background: #0f172a; border-radius: 2px; }
+select, input[type=text], input[type=password] { background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 8px; font-size: 12px; }
 
-/* ゲートパネル */
-#gate { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; align-items: center; justify-content: center; }
-.gate-panel { background: var(--panel); padding: 40px; border: 2px solid var(--border); border-radius: 12px; text-align: center; width: 380px; }
+@media (max-width: 720px) {
+  main { grid-template-columns: 1fr; }
+  aside { position: fixed; bottom: 0; width: 100%; height: 45%; border-left: none; border-top: 2px solid var(--border); }
+}
 </style>
 </head>
 <body>
 
 <div id="gate">
   <div class="gate-panel">
-    <div style="font-family: 'JetBrains Mono'; font-size: 20px; font-weight: 700; margin-bottom: 20px;">STUDIO<em>CONSOL</em> LOGIN</div>
-    <input type="password" id="access-input" placeholder="PASSCODE" oninput="auth()" style="width: 100%; text-align: center; padding:12px; border:1px solid var(--border); border-radius:8px;">
+    <div class="logo" style="font-size: 24px; margin-bottom: 24px;">STUDIO<em>CONSOL</em> LOGIN</div>
+    <input type="password" id="access-input" placeholder="ACCESS CODE" oninput="auth()" style="width: 100%; text-align: center; letter-spacing: 4px; padding:12px;">
   </div>
 </div>
 
 <div id="app">
   <header>
-    <div style="font-family: 'JetBrains Mono'; font-weight: 700;">STUDIO<em>CONSOL</em> // v4.5</div>
-    <div style="margin-left: auto; display: flex; gap: 10px;">
-      <div><span style="font-size:9px; display:block">INPUT (Mic)</span><select id="mic-in" onchange="initAudio(true)"></select></div>
-      <div><span style="font-size:9px; display:block">OUTPUT (Speaker/HP)</span><select id="spk-out" onchange="changeOutput()"></select></div>
+    <div class="logo">STUDIO<em>CONSOL</em> // v4.7</div>
+    <div style="margin-left: auto; display: flex; gap: 15px; align-items: center;">
+      <div><span style="font-size:8px; display:block">INPUT</span><select id="mic-in" onchange="initAudio(true)" style="width:160px;"></select></div>
+      <div><span style="font-size:8px; display:block">OUTPUT</span><select id="spk-out" onchange="changeOutput()" style="width:160px;"></select></div>
     </div>
   </header>
 
   <main>
     <section id="stage">
-      <div id="lyric-display">API経由で曲を検索してください</div>
-      <div id="yt-player-wrap" style="position: absolute; bottom: 20px; right: 20px; width: 300px; aspect-ratio: 16/9; background: #000; border: 2px solid var(--border); display:none;"></div>
+      <div id="lyric-display">機材を準備して曲を検索してください</div>
+      <div id="yt-player-wrap" style="position: absolute; bottom: 24px; right: 24px; width: 300px; aspect-ratio: 16/9; background: #000; border: 2px solid var(--border); display:none; box-shadow: 0 10px 15px rgba(0,0,0,0.2);"></div>
     </section>
 
     <aside>
       <div class="card">
-        <div class="label">GRADES // 採点</div>
+        <div class="label">GRADES // リアルタイム採点</div>
         <div class="score-lcd" id="score-num">00</div>
-        <canvas id="viz" style="width:100%; height:40px; background:#0f172a; margin-top:10px;"></canvas>
+        <canvas id="viz" style="margin-top:12px;"></canvas>
       </div>
 
       <div class="card">
-        <div class="label">YOUTUBE SEARCH // 検索</div>
-        <div style="display:flex; gap:4px;">
-          <input type="text" id="q" placeholder="曲名・アーティスト名" style="flex:1; padding:8px;">
+        <div class="label">YOUTUBE SEARCH // 楽曲検索</div>
+        <div style="display:flex; gap:4px; margin-bottom:8px;">
+          <input type="text" id="q" placeholder="曲名・アーティスト名" style="flex:1;">
           <button class="btn" onclick="searchAPI()">検索</button>
         </div>
-        <div id="yt-results" style="max-height:100px; overflow-y:auto; background:#fff; margin-top:5px; font-size:11px; display:none;"></div>
+        <div id="yt-results" style="max-height:120px; overflow-y:auto; background:#fff; font-size:11px; display:none; border:1px solid var(--border);"></div>
       </div>
 
       <div class="card">
-        <div class="label">FX & MONITOR // 効果</div>
+        <div class="label">FX & MONITOR // 効果設定</div>
         <div style="display: flex; gap: 8px;">
-          <button id="tog-mon" class="btn btn-active" style="flex:1" onclick="toggleFeat('mon')">MONITOR</button>
-          <button id="tog-echo" class="btn btn-active" style="flex:1" onclick="toggleFeat('echo')">ECHO</button>
+          <button id="tog-mon" class="btn btn-active" style="flex:1" onclick="toggleFeat('mon')">MONITOR ON</button>
+          <button id="tog-echo" class="btn btn-active" style="flex:1" onclick="toggleFeat('echo')">ECHO ON</button>
         </div>
       </div>
 
-      <button id="start-btn" class="btn" style="background:#10b981; color:white; height:60px; font-size:16px;" onclick="toggle()">MASTER START</button>
+      <button id="start-btn" class="btn" onclick="toggle()" style="background:#10b981; color:white; height:64px; font-size:16px;">MASTER START</button>
     </aside>
   </main>
 </div>
@@ -109,38 +154,33 @@ aside { background: var(--panel); border-left: 2px solid var(--border); padding:
 const API_KEY = 'AIzaSyC5KcQmz45w9ESTM6QmbvXHom8ANBbV9fc'; 
 const PASS = 'yoha_88ku99_channnnnn';
 
-let ctx, mic, anl, hp, dly, fb, mon, rec, chunks = [], stream, voiceDest, player;
+let ctx, mic, anl, hp, dly, fb, mon, stream, voiceDest;
 let active = false, lrc = [], startT = 0, feats = { mon: true, echo: true };
 
 function auth() { if(document.getElementById('access-input').value === PASS) document.getElementById('gate').style.display='none', loadDevices(); }
 
 async function loadDevices() {
   try {
-    const streamTest = await navigator.mediaDevices.getUserMedia({ audio: true });
+    await navigator.mediaDevices.getUserMedia({ audio: true });
     const ds = await navigator.mediaDevices.enumerateDevices();
     const micS = document.getElementById('mic-in');
     const spkS = document.getElementById('spk-out');
-    
     micS.innerHTML = ""; spkS.innerHTML = "";
     ds.forEach(d => {
       const o = document.createElement('option'); o.value = d.deviceId; o.textContent = d.label;
       if (d.kind === 'audioinput') {
         if(d.label.includes('Sony') || d.label.includes('UAB-80')) o.selected = true;
         micS.appendChild(o);
-      } else if (d.kind === 'audiooutput') {
-        spkS.appendChild(o);
-      }
+      } else if (d.kind === 'audiooutput') spkS.appendChild(o);
     });
-    streamTest.getTracks().forEach(t => t.stop());
   } catch(e) { console.error("Device Load Error", e); }
 }
 
 async function changeOutput() {
   const deviceId = document.getElementById('spk-out').value;
-  // 背景動画（Video/Audio）の出力先を切り替え
-  const video = document.getElementById('video-bg');
-  if (video && typeof video.setSinkId === 'function') {
-    await video.setSinkId(deviceId);
+  const iframe = document.querySelector('iframe');
+  if (iframe && typeof iframe.setSinkId === 'function') {
+    try { await iframe.setSinkId(deviceId); } catch(e) { console.warn("setSinkId not supported on this iframe/browser"); }
   }
 }
 
@@ -150,18 +190,14 @@ async function initAudio(force = false) {
   try {
     const id = document.getElementById('mic-in').value;
     stream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: id ? { exact: id } : undefined, echoCancellation: false } });
-    
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     if (ctx.state === 'suspended') await ctx.resume();
-
     mic = ctx.createMediaStreamSource(stream);
     hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 100;
     anl = ctx.createAnalyser(); dly = ctx.createDelay(); fb = ctx.createGain(); mon = ctx.createGain();
     voiceDest = ctx.createMediaStreamDestination();
-
     mic.connect(hp); hp.connect(anl); anl.connect(dly); dly.connect(fb); fb.connect(dly); dly.connect(mon); anl.connect(mon);
     mon.connect(ctx.destination); mon.connect(voiceDest);
-    
     updateFX();
     return true;
   } catch(e) { return false; }
@@ -169,8 +205,8 @@ async function initAudio(force = false) {
 
 function toggleFeat(f) {
   feats[f] = !feats[f];
-  const btn = document.getElementById('tog-' + (f === 'mon' ? 'mon' : 'echo'));
-  btn.classList.toggle('btn-active', feats[f]);
+  document.getElementById('tog-' + f).classList.toggle('btn-active', feats[f]);
+  document.getElementById('tog-' + f).textContent = (f === 'mon' ? 'MONITOR ' : 'ECHO ') + (feats[f] ? 'ON' : 'OFF');
   updateFX();
 }
 
@@ -181,27 +217,29 @@ function updateFX() {
   mon.gain.setTargetAtTime(feats.mon ? 0.7 : 0, ctx.currentTime, 0.1);
 }
 
-// ── YouTube検索 API ──
 async function searchAPI() {
   const q = document.getElementById('q').value;
   if(!q) return;
-  const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q + " カラオケ")}&type=video&maxResults=5&key=${API_KEY}`);
-  const data = await res.json();
-  if(!data.items) return alert("API制限またはエラーです。");
-  const container = document.getElementById('yt-results');
-  container.innerHTML = data.items.map(item => `
-    <div style="padding:5px; border-bottom:1px solid #eee; cursor:pointer" onclick="playVideo('${item.id.videoId}', '${item.snippet.title}')">
-      ${item.snippet.title}
-    </div>
-  `).join('');
-  container.style.display = 'block';
+  try {
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q + " カラオケ")}&type=video&maxResults=5&key=${API_KEY}`);
+    const data = await res.json();
+    if(!data.items) throw new Error("API Limit or Error");
+    const container = document.getElementById('yt-results');
+    container.innerHTML = data.items.map(item => `
+      <div style="padding:10px; border-bottom:1px solid #eee; cursor:pointer" onclick="playVideo('${item.id.videoId}', '${item.snippet.title.replace(/'/g, "\\'")}')">
+        ${item.snippet.title}
+      </div>
+    `).join('');
+    container.style.display = 'block';
+  } catch(e) { alert("YouTube APIエラー: 設定を確認してください。"); }
 }
 
 function playVideo(id, title) {
   const wrap = document.getElementById('yt-player-wrap');
   wrap.style.display = 'block';
-  wrap.innerHTML = `<iframe id="yt-frame" width="100%" height="100%" src="https://www.youtube.com/embed/${id}?autoplay=1&enablejsapi=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+  wrap.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${id}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
   document.getElementById('lyric-display').textContent = title;
+  document.getElementById('yt-results').style.display = 'none';
 }
 
 function toggle() {
@@ -210,12 +248,15 @@ function toggle() {
     active = false;
     btn.classList.remove('btn-active');
     btn.style.background = "#10b981";
+    btn.textContent = "MASTER START";
   } else {
     initAudio().then(ok => {
       if(!ok) return;
       active = true;
       btn.classList.add('btn-active');
-      btn.style.background = var(--red);
+      btn.style.background = "#ef4444"; // 直接カラーコードを指定して構文エラーを回避
+      btn.textContent = "STOP & ARCHIVE";
+      loop();
     });
   }
 }
